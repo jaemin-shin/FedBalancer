@@ -1,0 +1,17 @@
+*.pyc
+*.out
+*.pb
+.DS_Store
+.idea
+*.meta
+*.index
+*.data-00000-of-00001
+
+models/__pycache__/
+models/*/__pycache__/
+models/*/preprocess/__pycache__/
+utils/__pycache__/
+models/cached_timers.json
+models/grad_compress/temp/*
+_build/
+_templates/
