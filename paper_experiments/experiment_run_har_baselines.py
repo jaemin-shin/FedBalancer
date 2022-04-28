@@ -18,7 +18,7 @@ config_lines = [
 'update_frac 0.01',
 'aggregate_algorithm SucFedAvg',
 'num_epochs 5',
-'output_path ../models/configs/har/'
+'output_path ../models/configs/har/',
 'global_final_time 500000']
 
 
