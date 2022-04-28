@@ -1,50 +1,64 @@
-# FLASH
+# FedBalancer
 
-- An Open Source *Heterogeneity-Aware* Federated Learning Platform
-- This repository is based on a fork of [Leaf](https://leaf.cmu.edu/), a benchmark for federated settings.
+- A systematic federated learning with sample selection to optimize the time-to-accuracy performance
+- Includes an adaptive deadline control scheme that predicts the optimal deadline for each round with varying client data
 
 This repository contains the code and experiments for the paper:
 
->  [WWW'21](https://www2021.thewebconf.org/)
+>  Conditionally accepted to [MobiSys'22](https://www.sigmobile.org/mobisys/2022/)
 >
-> [Characterizing Impacts of Heterogeneity in Federated Learning upon Large-Scale Smartphone Data]()
+> [FedBalancer: Data and Pace Control for Efficient Federated Learning on Heterogeneous Clients](https://arxiv.org/abs/2201.01601)
 
-## What is FLASH?
+## System Requirements
 
-Briefly speaking, we develop FLASH to incorporate **heterogeneity** into the federated learning simulation process. We mainly follow Google's [FL protocol](https://arxiv.org/pdf/1902.01046.pdf) to implement FLASH, so compared to other platforms, we add many additional system configurations, e.g., deadline. For these configurations, see more details in the [config file](#config).
+The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.14.0```.
 
-### Heterogeneity
+Please use ```virtualenv``` to run a self-contained setup:
 
-**Hardware Heterogeneity**: Each client is bundled with a device type. Each device type has different training speeds and network speeds. We also support self-defined device type(-1) whose parameter can be set manually for more complexed simulation. 
+```
+$ git clone https://github.com/jaemin-shin/FedBalancer.git
+$ virtualenv ./fedbalancer-venv -p python3.6
+$ source ./fedbalancer-venv/bin/activate
+$ pip install -r requirements.txt
+```
 
-The source code for measure the on-device training time is available in the [OnDeviceTraining](https://github.com/www21submission/flash/tree/master/OnDeviceTraining) directory
+## Disclaimer (IMPORTANT)
 
-**State(Behavior) Heterogeneity**: the state and running environment of participating clients can be various and dynamic. We follow [Google's FL system](https://arxiv.org/pdf/1902.01046.pdf), i.e., clients are available for training only when the device is idle, charging, and connected to WiFi. To simulate state heterogeneity, we provide a default state trace which can be accessed [here](./data/state_traces.json). This default trace is sampled from the large-scale real-world trace (as we use in our paper) that involves upto 136k devices.
+We evaluated based on five datasets: ```FEMNIST```, ```Celeba```, ```Reddit```, ```Shakespeare```, ```UCI-HAR```.
 
-Note: FLASH will run in a heterogeneity-unaware (ideal) mode if trace file is not found or `hard_hete` and `behav_hete` are set to `False`
+Currently, this repository only supports experiments with ```UCI-HAR```.
 
+Handling other datasets will be added soon.
 
+## How to run the experiments
 
-## How to run it
+### Running the main experiment of the paper in Section 4.2 and 4.3 one by one
 
-### example
+1. Go to directory of dataset `data/har` for instructions on generating the benchmark dataset
+2. Run (please refer to the list of config files in ```configs/har```, it contains all the config files for the experiment)
+```
+$ cd models/
 
-```bash
-# 1. Clone and install requirments
-git clone https://github.com/PKU-Chengxu/FLASH.git
-pip3 install -r requirements.txt
+# FedAvg + 1T experiment in Section 4.2 and 4.3 with random seed 0
+$ python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
 
-# 2. Change state traces (optional)
-# We have a provided a default state traces containing 1000 devices' data, located at the ./data/ dir. 
-# IF you want to use a self-collected traces, just modify the file path in [models/client.py](models/client.py), i.e. with open('/path/to/state_traces.json', 'r', encoding='utf-8') as f: 
+# FedBalancer experiment in Section 4.2 and 4.3 with random seed 0
+$ python main.py --config=configs/har/har_fedbalancer_seed0.cfg
+```
 
-# 3. Download a benchmark dataset, go to directory of respective dataset `data/$DATASET` for instructions on generating the benchmark dataset
+### Running the main experiment of the paper in Section 4.2 and 4.3 at ONCE
 
-# 4. Run
-cd models/
-python3 main.py [--config yourconfig.cfg]
-# use --config option to specify the config-file, default.cfg will be used if not specified
-# the output log is CONFIG_FILENAME.log
+1. Go to directory of dataset `data/har` for instructions on generating the benchmark dataset
+2. Configure your python file
+3. Run (IMPORTANT NOTE: before you run the experiment, please refer to the python file that runs all the experiments in `paper_experiments`. You need to assign which GPU you will assign at each experiment, and you may need to run experiments partially as running all the experiments may exceed the VRAM of your GPU)
+```
+$ cd models/
+
+# Run baseline experiments
+$ python ../paper_experiments/experiment_run_har_baselines.py
+
+# Run fedbalancer experiments
+$ python ../paper_experiments/experiment_run_har_fedbalancer.py
 ```
 
 <h3 id="config">Config File</h3>
@@ -101,6 +115,8 @@ aggregate_algorithm SucFedAvg # choose in [SucFedAvg, FedAvg], please refer to m
 # qffl_q 5
 ```
 
+## How to parse the results after the experiment
+
 
 ## Benchmark Datasets
 
@@ -127,35 +143,13 @@ aggregate_algorithm SucFedAvg # choose in [SucFedAvg, FedAvg], please refer to m
 - **Task:** Next-word Prediction.
 
 
-
-## Results in the paper
-
-Config file and results are in the `paper_experiments` folder. You can just modify the `models/default.cfg` and then run `python main.py` to reproduce all the experiments in our paper. The experiments can be devided into the following categories:
-
-- Basic FL algorithm
-- Advanced FL algorithms
-- Breakdown of Heterogeneity
-- Device Failure
-- Participation Bias
+#### Shakespeare
 
 
-
-## On-device Training
-
-the code we used to measure the on-device training time is in `OnDeviceTraining` folder. Please refer to the [doc](OnDeviceTraining/README.md) for more details
+#### UCI-HAR
 
 
 
 ## Notes
 
-- please consider to cite our paper if you use the code or data in your research project.
-
-
-> ```
-> @inproceedings{yang2019characterizing,
->   title={Characterizing impacts of heterogeneity in federated learning upon large-scale smartphone data},
->   author={Yang, Chengxu and Wang Qipeng and Xu, Mengwei and Chen, Zhenpeng and Bian Kaigui and Liu, Yunxin and Liu, Xuanzhe},
->   booktitle={The World Wide Web Conference},
->   year={2021}
-> }
-> ```
+- This repository is based on [Chengxu Yang et al.'s work, FLASH](https://github.com/PKU-Chengxu/FLASH), which is a heterogeneity-aware benchmarking framework for FL based on [Sebastian Calas et al.'s work, LEAF](https://leaf.cmu.edu/).
