@@ -22,7 +22,7 @@ $ source ./fedbalancer-venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-## Disclaimer (IMPORTANT)
+## Important Note
 
 We evaluated based on five datasets: ```FEMNIST```, ```Celeba```, ```Reddit```, ```Shakespeare```, ```UCI-HAR```.
 
@@ -30,7 +30,7 @@ Currently, this repository only supports experiments with ```UCI-HAR```.
 
 Handling other datasets will be added soon.
 
-## How to run the experiments
+## How to Run the Experiments
 
 ### Running the main experiment of the paper in Section 4.2 and 4.3 one by one
 
@@ -138,7 +138,7 @@ noise_factor 0.5 # noise factor for differential privacy of FedBalancer
 # realoortbalancer # this option allows us to perform OortBalancer as described in Section 3.4. This should not be used with fedbalancer True option.
 ```
 
-## How to parse the results after the experiment
+## How to Parse the Results After the Experiment
 - Please refer to the jupyter notebook ipynb scripts in ```results_parsing```
 
 
