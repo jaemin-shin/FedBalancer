@@ -11,7 +11,7 @@ This repository contains the code and experiments for the paper:
 
 ## System Requirements
 
-The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.14.0```, running on ```Ubuntu 18.04``` server.
+The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.14.0```, running on ```Ubuntu 18.04``` server with eight ```NVIDIA TITAN Xp``` GPUs. The experimental results on different setup and different GPUs may differ, but the results will derive same conclusions that we stated in our paper.
 
 Please use ```virtualenv``` to run a self-contained setup:
 
