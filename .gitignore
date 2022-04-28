@@ -15,3 +15,5 @@ models/cached_timers.json
 models/grad_compress/temp/*
 _build/
 _templates/
+
+data/har/data/*
