@@ -147,8 +147,6 @@ class Config():
                         self.fedprox = line[1].strip()=='True'
                     elif line[0] == 'fedprox_mu':
                         self.fedprox_mu = float(line[1].strip())
-                    elif line[0] == 'fedprox_active_frac':
-                        self.fedprox_active_frac = float(line[1].strip())
                     elif line[0] == 'structure_k':
                         self.structure_k = int(line[1].strip())
                     elif line[0] == 'qffl':
