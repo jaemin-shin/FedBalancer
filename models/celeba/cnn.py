@@ -9,7 +9,7 @@ from fedprox import PerturbedGradientDescent
 
 
 IMAGE_SIZE = 84
-IMAGES_DIR = os.path.join('/mnt/sting/jmshin/FedBalancer/FLASH_jm/', 'data', 'celeba', 'data', 'raw', 'img_align_celeba')
+IMAGES_DIR = os.path.join('..', 'data', 'celeba', 'data', 'raw', 'img_align_celeba')
 
 
 class ClientModel(Model):

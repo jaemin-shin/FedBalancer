@@ -31,28 +31,15 @@ class ClientModel(Model):
           "classes": tf.argmax(input=logits, axis=1),
           "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
         }
-        # loss_list = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits, reduction=tf.losses.Reduction.NONE)
-        # sum_loss = tf.reduce_sum(loss_list)
         loss_list = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits, reduction=tf.losses.Reduction.NONE)
         loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
         
-        # TODO: Confirm that opt initialized once is ok?
         train_op = self.optimizer.minimize(
             loss=loss,
             global_step=tf.train.get_global_step())
         eval_metric_ops = tf.count_nonzero(tf.equal(labels, predictions["classes"]))
 
         batch_gradients = []
-        # batch_gradients = [tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[0])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[1])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[2])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[3])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[4])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[5])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[6])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[7])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[8])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[9])])]
 
         return features, labels, train_op, eval_metric_ops, loss, loss_list, flag_training, batch_gradients
 
