@@ -5,6 +5,20 @@ The dataset contains accelerometer and gyroscope data from 30 volunteers perform
 
 ## Setup Instructions
 
-1. Run ```mkdir data``` to create directory named data in this directory.
-2. Download ```UCI HAR Dataset.zip``` file [here](https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones) and unzip the data into a ```data``` subfolder in this directory.
-3. With the data in the appropriate directory, run build the training vocabulary by running ```python build_vocab.py --data-dir ./data/train --target-dir vocab```. 
+1. Create subdirectory named ```data``` in this directory, and create sub-subdirectory names ```train``` and ```test```. Then, change directory.
+```
+mkdir -p data
+mkdir -p data/train
+mkdir -p data/test
+cd data
+```
+2. Download ```UCI HAR Dataset.zip``` file [here](https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones) to the ```data``` subdirectory.
+3. Unzip the data at a ```data``` subdirectory with the following command, and change to the parent directory.
+```
+unzip 'UCI HAR Dataset.zip'
+cd ..
+```
+4. Run preprocessing.py to generate .json files in ```data/train``` and ```data/test```.
+```
+python preprocessing.py
+```
