@@ -11,7 +11,7 @@ This repository contains the code and experiments for the paper:
 
 ## System Requirements
 
-The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.14.0```.
+The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.14.0```, running on ```Ubuntu 18.04``` server.
 
 Please use ```virtualenv``` to run a self-contained setup:
 
@@ -98,7 +98,7 @@ aggregate_algorithm SucFedAvg # choose in [SucFedAvg, FedAvg], please refer to m
 # qffl_q 5
 
 ## parameters related to Oort client selection method, please refer to the OSDI'21 (https://www.usenix.org/conference/osdi21/presentation/lai) for more
-# realoort True # whether to apply oort or not
+realoort True # whether to apply oort or not
 # oort_pacer True # whether to apply oort-pacer or not
 # oort_pacer_delta 10
 # oort_blacklist True # whether to apply oort's client blacklisting or not
@@ -118,22 +118,22 @@ aggregate_algorithm SucFedAvg # choose in [SucFedAvg, FedAvg], please refer to m
 # fedprox_mu 0.5
 
 ## Other paraemeters
-# global_final_time 500000 # the experiment terminates if the time in the experiment exceeds the global_final_time
+global_final_time 500000 # the experiment terminates if the time in the experiment exceeds the global_final_time
 # global_final_test_accuracy 0.9 # the experiment terminates if the test accuracy exceeds the global_final_test_accuracy
 # output_path /path/to/your/preferred/directory # path to save experiment output files -- attended clients and clients info
 
 ### ----- NOTE! below are configurations for FedBalancer.
 ### ----- Strongly recommend: please refer to our paper when configuring below parameters.
-# fedbalancer True
-# fb_w 20
-# fb_p 1.0
-# fb_simple_control_lt True # whether to control the loss threshold
-# fb_simple_control_ddl True # whether to control the deadline
-# fb_simple_control_lt_stepsize 0.05 # ltr in our paper
-# fb_simple_control_ddl_stepsize 0.05 # ddlr in our paper
-# fb_client_selection True # if True, fedbalancer performs client selection based on Oort, as written in Section 3.2.3 in our paper. We recommend to set this as True.
-# fb_inference_pipelining True # if True, fedbalancer clients only performs full-data inference once, when they are first selected for a round. If False, fedbalancer clients performs full-data inference at every selected round to get up-to-date sample-level loss. We recommend to set this as True.
-# noise_factor 0.5 # noise factor for differential privacy of FedBalancer
+fedbalancer True
+fb_w 20
+fb_p 1.0
+fb_simple_control_lt True # whether to control the loss threshold
+fb_simple_control_ddl True # whether to control the deadline
+fb_simple_control_lt_stepsize 0.05 # ltr in our paper
+fb_simple_control_ddl_stepsize 0.05 # ddlr in our paper
+fb_client_selection True # if True, fedbalancer performs client selection based on Oort, as written in Section 3.2.3 in our paper. We recommend to set this as True.
+fb_inference_pipelining True # if True, fedbalancer clients only performs full-data inference once, when they are first selected for a round. If False, fedbalancer clients performs full-data inference at every selected round to get up-to-date sample-level loss. We recommend to set this as True.
+noise_factor 0.5 # noise factor for differential privacy of FedBalancer
 
 # realoortbalancer # this option allows us to perform OortBalancer as described in Section 3.4. This should not be used with fedbalancer True option.
 ```
