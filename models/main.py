@@ -157,14 +157,14 @@ def main():
         time_window = server.get_time_window() 
         logger.info('current time: {}\ttime window: {}\t'.format(cur_time, time_window))
         
-        if cfg.global_deadline_time != 0 and cur_time > cfg.global_deadline_time: 
+        if cfg.global_final_time != 0 and cur_time > cfg.global_final_time: 
             break
 
         if type(current_test_accuracy) is np.ndarray:
-            if cfg.global_test_accuracy != 0.0 and current_test_accuracy[0] > cfg.global_test_accuracy: 
+            if cfg.global_final_test_accuracy != 0.0 and current_test_accuracy[0] > cfg.global_final_test_accuracy: 
                 break
         else:
-            if cfg.global_test_accuracy != 0.0 and current_test_accuracy > cfg.global_test_accuracy: 
+            if cfg.global_final_test_accuracy != 0.0 and current_test_accuracy > cfg.global_final_test_accuracy: 
                 break
             
         online_clients = online(train_clients, cur_time, time_window)
@@ -217,16 +217,16 @@ def main():
             if (i + 1) % (10*eval_every) == 0 or (i + 1) == num_rounds:
                 test_num = len(test_clients)
                 config_name_split = config_name.split('/')
-                with open(config_name_split[0]+'/'+config_name_split[1]+'/attended_clients/'+config_name_split[2]+'_attended_clients.json', 'w') as fp:
+                with open(cfg.output_path+'/attended_clients/'+config_name_split[-1][:-4]+'_attended_clients.json', 'w') as fp:
                     json.dump(list(attended_clients), fp)
                     logger.info('save attended_clients.json')
                 
                 # Save server model
-                ckpt_path = os.path.join('checkpoints', cfg.dataset)
-                ckpt_path = os.path.join(ckpt_path, config_name_split[2][:-4])
+                ckpt_path = os.path.join('../models/checkpoints', cfg.dataset)
+                ckpt_path = os.path.join(ckpt_path, config_name_split[-1][:-4])
                 if not os.path.exists(ckpt_path):
                     os.makedirs(ckpt_path)
-                save_path = server.save_model(os.path.join(ckpt_path, '{}.ckpt'.format(config_name_split[2])))
+                save_path = server.save_model(os.path.join(ckpt_path, '{}.ckpt'.format(config_name_split[-1][:-4])))
                 logger.info('Model saved in path: %s' % save_path)
                 
             test_clients = random.sample(test_clients, test_num) 
@@ -242,16 +242,16 @@ def main():
     test_num = len(test_clients)
     test_num = len(test_clients)
     config_name_split = config_name.split('/')
-    with open(config_name_split[0]+'/'+config_name_split[1]+'/attended_clients/'+config_name_split[2]+'_attended_clients.json', 'w') as fp:
+    with open(cfg.output_path+'/attended_clients/'+config_name_split[-1][:-4]+'_attended_clients.json', 'w') as fp:
         json.dump(list(attended_clients), fp)
         logger.info('save attended_clients.json')
     
     # Save server model
-    ckpt_path = os.path.join('checkpoints', cfg.dataset)
-    ckpt_path = os.path.join(ckpt_path, config_name_split[2][:-4])
+    ckpt_path = os.path.join('../models/checkpoints', cfg.dataset)
+    ckpt_path = os.path.join(ckpt_path, config_name_split[-1][:-4])
     if not os.path.exists(ckpt_path):
         os.makedirs(ckpt_path)
-    save_path = server.save_model(os.path.join(ckpt_path, '{}.ckpt'.format(config_name_split[2])))
+    save_path = server.save_model(os.path.join(ckpt_path, '{}.ckpt'.format(config_name_split[-1][:-4])))
     logger.info('Model saved in path: %s' % save_path)
         
     test_clients = random.sample(test_clients, test_num) 

@@ -46,8 +46,7 @@ class Config():
         self.qffl_q = 0
         
         self.fedbalancer = False
-        self.fb_action_step = 1
-        self.fb_action_step_division_for_jump = 1
+        self.fb_w = 1
 
         self.fb_p = 0.0
 
@@ -75,7 +74,10 @@ class Config():
         self.ddl_baseline_fixed = False
         self.ddl_baseline_fixed_value_multiplied_at_mean = 0.0 
 
-        self.global_deadline_time = 0
+        self.global_final_time = 0
+        self.global_final_test_accuracy = 0.0
+
+        self.output_path = ''
         
         logger.info('read config from {}'.format(config_file))
         self.read_config(config_file)
@@ -158,10 +160,8 @@ class Config():
                         self.user_trace = line[1].strip()=='True'
                     elif line[0] == 'fedbalancer':
                         self.fedbalancer = line[1].strip()=='True'
-                    elif line[0] == 'fedbalancer_action_step':
-                        self.fb_action_step = int(line[1].strip())
-                    elif line[0] == 'fedbalancer_action_step_division_for_jump':
-                        self.fb_action_step_division_for_jump = int(line[1].strip())
+                    elif line[0] == 'fb_w':
+                        self.fb_w = int(line[1].strip())
                     elif line[0] == 'fb_client_selection':
                         self.fb_client_selection = line[1].strip()=='True'
                     elif line[0] == 'realoort':
@@ -177,7 +177,7 @@ class Config():
                     elif line[0] == 'oort_blacklist_rounds':
                         self.oort_blacklist_rounds = int(line[1].strip())
                     elif line[0] == 'fb_p':
-                        self.fb_p = float(line[1].strip())
+                        self.fb_p = 1.0 - float(line[1].strip())
                     elif line[0] == 'fb_inference_pipelining':
                         self.fb_inference_pipelining = line[1].strip()=='True'
                     elif line[0] == 'fb_simple_control_lt':
@@ -196,10 +196,14 @@ class Config():
                         self.ddl_baseline_fixed = line[1].strip()=='True'
                     elif line[0] == 'ddl_baseline_fixed_value_multiplied_at_mean':
                         self.ddl_baseline_fixed_value_multiplied_at_mean = float(line[1].strip())
-                    elif line[0] == 'global_deadline_time':
-                        self.global_deadline_time = int(line[1].strip())
+                    elif line[0] == 'global_final_time':
+                        self.global_final_time = int(line[1].strip())
+                    elif line[0] == 'global_final_test_accuracy':
+                        self.global_final_test_accuracy = float(line[1].strip())
                     elif line[0] == 'noise_factor':
                         self.noise_factor = float(line[1].strip())
+                    elif line[0] == 'output_path':
+                        self.output_path = str(line[1])
                 except Exception as e:
                     traceback.print_exc()
         if self.real_world and 'realworld' not in self.dataset:

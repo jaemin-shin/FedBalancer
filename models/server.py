@@ -89,8 +89,6 @@ class Server:
             self.clients_info[str(c.id)]["device"] = c.device.device_model
             self.client_download_time[str(c.id)] = []
             self.client_upload_time[str(c.id)] = []
-            if self.cfg.hard_hete_formulation:
-                self.clients_info[str(c.id)]["speed"] = c.device.sampled_train_time_per_batch
             self.clients_info[str(c.id)]["sample_num"] = len(c.train_data['y'])
             if self.cfg.fedbalancer or self.cfg.realoortbalancer:
                 self.client_one_epoch_train_time_dict[str(c.id)] = -1
@@ -817,10 +815,10 @@ class Server:
                 current_round_loss = (sorted_loss_sum / num_of_samples) / (self.deadline)
                 self.prev_train_losses.append(current_round_loss)
                 logger.info('current_round_loss: {}'.format(current_round_loss))
-                if self.current_round % int(self.cfg.fb_action_step / self.cfg.fb_action_step_division_for_jump) == int(self.cfg.fb_action_step / self.cfg.fb_action_step_division_for_jump) - 1 :
-                    if len(self.prev_train_losses) >= 2 * self.cfg.fb_action_step:
+                if self.current_round % int(self.cfg.fb_w) == int(self.cfg.fb_w) - 1 :
+                    if len(self.prev_train_losses) >= 2 * self.cfg.fb_w:
                         if self.cfg.fb_simple_control_lt or self.cfg.fb_simple_control_ddl:
-                            nonscaled_reward = (np.mean(self.prev_train_losses[-(self.cfg.fb_action_step*2):-(self.cfg.fb_action_step)]) - np.mean(self.prev_train_losses[-(self.cfg.fb_action_step):]))
+                            nonscaled_reward = (np.mean(self.prev_train_losses[-(self.cfg.fb_w*2):-(self.cfg.fb_w)]) - np.mean(self.prev_train_losses[-(self.cfg.fb_w):]))
                         
                         if self.cfg.fb_simple_control_lt:
                             if nonscaled_reward > 0:
@@ -1114,6 +1112,6 @@ class Server:
     
     def save_clients_info(self):
         config_name_split = self.cfg.config_name.split('/')
-        with open(config_name_split[0]+'/'+config_name_split[1]+'/clients_info/'+config_name_split[2]+'_clients_info.json', 'w') as f:
+        with open(self.cfg.output_path+'/clients_info/'+config_name_split[-1][:-4]+'_clients_info.json', 'w') as f:
             json.dump(self.clients_info, f)
         logger.info('save clients_info.json.')

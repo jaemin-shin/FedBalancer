@@ -15,20 +15,21 @@ config_lines = [
 'min_selected 1',
 'max_sample 2147483647',
 'batch_size 10',
+'round_ddl 60 0',
 'update_frac 0.01',
 'aggregate_algorithm SucFedAvg',
 'num_epochs 5',
-'output_path ../models/configs/har/'
+'output_path ../models/configs/har/',
+'fedbalancer True',
+'fb_simple_control_lt True',
+'fb_simple_control_ddl True',
+'fb_inference_pipelining True',
+'fb_client_selection True',
 'global_final_time 500000']
 
 
-baseline_lines = [
-(['fedavg_1T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 1.0']),
-(['fedavg_2T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 2.0']),
-(['fedavg_SPC'], ['ddl_baseline_smartpc True', 'ddl_baseline_smartpc_percentage 0.8']),
-(['fedavg_WFA'], ['ddl_baseline_smartpc True', 'ddl_baseline_smartpc_percentage 1.0']),
-(['fedprox_mu_0_0_1T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 1.0', 'fedprox True', 'fedprox_mu 0.0']),
-(['fedprox_mu_0_0_2T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 2.0', 'fedprox True', 'fedprox_mu 0.0']),
+fedbalancer_lines = [
+(['fedbalancer'], ['fb_w 20', 'fb_simple_control_lt_stepsize 0.05', 'fb_simple_control_ddl_stepsize 0.05', 'fb_p 1.0'])
 ]
 
 process_count = 0
@@ -36,26 +37,11 @@ gpu_id = {}
 gpu_id[0] = 0
 gpu_id[1] = 0
 gpu_id[2] = 0
-gpu_id[3] = 0
-gpu_id[4] = 0
-gpu_id[5] = 0
-gpu_id[6] = 0
-gpu_id[7] = 0
-gpu_id[8] = 0
-gpu_id[9] = 1
-gpu_id[10] = 1
-gpu_id[11] = 1
-gpu_id[12] = 1
-gpu_id[13] = 1
-gpu_id[14] = 1
-gpu_id[15] = 1
-gpu_id[16] = 1
-gpu_id[17] = 1
 
 process_count = 0
 
 for seed in range(3):
-    for exp in baseline_lines:
+    for exp in fedbalancer_lines:
         new_config_file = open('../models/configs/har/har_'+exp[0][0]+'_seed'+str(seed)+'.cfg', 'w')
         for line in config_lines:
             new_config_file.write(line+'\n')

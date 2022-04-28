@@ -1,2 +1,0 @@
-model_checkpoint_path: "har_batchexp_fedavg_ddl_fixed_1_0.cfg.ckpt"
-all_model_checkpoint_paths: "har_batchexp_fedavg_ddl_fixed_1_0.cfg.ckpt"
