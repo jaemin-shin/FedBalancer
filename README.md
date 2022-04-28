@@ -66,88 +66,80 @@ To simplify the command line arguments, we move most of the parameters to a <spa
 
 ```bash
 ## whether to consider heterogeneity
-behav_hete False # bool, whether to simulate state(behavior) heterogeneity
-hard_hete False # bool, whether to simulate hardware heterogeneity, which contains differential on-device training time and network speed
-
-
-## no training mode to tune system configurations
-no_training False # bool, whether to run in no_training mode, skip training process if True
-
+behav_hete False # bool, whether to simulate state(behavior) heterogeneity -> fixed to False in our experiments
+hard_hete False # bool, whether to simulate hardware heterogeneity, which contains differential on-device training time and network speed -> fixed to True in our experiments
 
 ## ML related configurations
-dataset femnist # dataset to use
-model cnn # file that defines the DNN model
-learning_rate 0.01 # learning-rate of DNN
+dataset har # dataset to use
+model lr # file that defines the model (in this example, it is LogisticRegression)
+learning_rate 0.0003 # learning-rate of LR
 batch_size 10 # batch-size for training 
 
-
 ## system configurations, refer to https://arxiv.org/abs/1812.02903 for more details
-num_rounds 500 # number of FL rounds to run
-clients_per_round 100 # expected clients in each round
-min_selected 60 # min selected clients number in each round, fail if not satisfied
-max_sample 340 #  max number of samples to use in each selected client
+num_rounds 6000 # number of FL rounds to run
+clients_per_round 5 # expected clients in each round
+min_selected 1 # min selected clients number in each round, fail if not satisfied -> fixed to 1 in our experiments
+max_sample 2147483647 #  max number of samples to use in each selected client -> fixed to large int in our experiments
 eval_every 5 # evaluate every # rounds, -1 for not evaluate
 num_epochs 5 # number of training epochs (E) for each client in each round
 seed 0 # basic random seed
-round_ddl 270 0 # μ and σ for deadline, which follows a normal distribution
-update_frac 0.8  # min update fraction in each round, round fails when fraction of clients that successfully upload their is not less than "update_frac"
-max_client_num -1 # max number of clients in the simulation process, -1 for infinite
+update_frac 0.01  # min update fraction in each round, round fails when fraction of clients that successfully upload their is not less than "update_frac" -> fixed to 0.01 in our experiments
 
+aggregate_algorithm SucFedAvg # choose in [SucFedAvg, FedAvg], please refer to models/server.py for more details. In the configuration file, SucFedAvg refers to the "FedAvg" algorithm described in https://arxiv.org/pdf/1602.05629.pdf -> this is fixed to SucFedAvg in our experiments
 
 ### ----- NOTE! below are advanced configurations. 
 ### ----- Strongly recommend: specify these configurations only after reading the source code. 
-### ----- Configuration items of [aggregate_algorithm, fedprox*, structure_k, qffl*] are mutually-exclusive 
 
-## basic algorithm
-aggregate_algorithm SucFedAvg # choose in [SucFedAvg, FedAvg], please refer to models/server.py for more details. In the configuration file, SucFedAvg refers to the "FedAvg" algorithm described in https://arxiv.org/pdf/1602.05629.pdf
-
-## compression algorithm
 # compress_algo grad_drop # gradiant compress algorithm, choose in [grad_drop, sign_sgd], not use if commented
 # structure_k 100
 ## the k for structured update, not use if commented, please refer to the arxiv for more 
 
-## advanced aggregation algorithms
-# fedprox True # whether to apply fedprox and params needed, please refer to the sysml'20 (https://arxiv.org/pdf/1812.06127.pdf) for more details
-# fedprox_mu 0.5
-# fedprox_active_frac 0.8
-
 # qffl True # whether to apply qffl(q-fedavg) and params needed, please refer to the ICLR'20 (https://arxiv.org/pdf/1905.10497.pdf) for more
 # qffl_q 5
+
+## parameters related to Oort client selection method, please refer to the OSDI'21 (https://www.usenix.org/conference/osdi21/presentation/lai) for more
+# realoort True # whether to apply oort or not
+# oort_pacer True # whether to apply oort-pacer or not
+# oort_pacer_delta 10
+# oort_blacklist True # whether to apply oort's client blacklisting or not
+# oort_blacklist_rounds
+
+### ----- NOTE! below are configurations for our baselines.
+### ----- Strongly recommend: specify these configurations only after reading the source code. 
+
+## parameters to configure deadlines
+# ddl_baseline_fixed True # True if experiment uses fixed deadline
+# ddl_baseline_fixed_value_multiplied_at_mean 1.0 # In our experiments, the deadline is sampled as mean of clients' round completion times. This parameter indicates the multiplication factor at the sampled deadline. If 1.0, the mean is just used, and this becomes the 1T experiment. If 2.0, 2.0 x mean is used, and this becomes the 2T experiment.
+# ddl_baseline_smartpc False # True if SmartPC or Wait-For-All experiment.
+# ddl_baseline_smartpc_percentage 0.8 # Specifies the portion of clients that will successfully send the result at a round. If 0.8, this indicates SmartPC experiment. If 1.0, the round waits for every clients to end, and this is Wait-For-All experiment.
+
+## fedprox parameters
+# fedprox True # whether to apply fedprox and params needed, please refer to the sysml'20 (https://arxiv.org/pdf/1812.06127.pdf) for more details
+# fedprox_mu 0.5
+
+## Other paraemeters
+# global_final_time 500000 # the experiment terminates if the time in the experiment exceeds the global_final_time
+# global_final_test_accuracy 0.9 # the experiment terminates if the test accuracy exceeds the global_final_test_accuracy
+# output_path /path/to/your/preferred/directory # path to save experiment output files -- attended clients and clients info
+
+### ----- NOTE! below are configurations for FedBalancer.
+### ----- Strongly recommend: please refer to our paper when configuring below parameters.
+# fedbalancer True
+# fb_w 20
+# fb_p 1.0
+# fb_simple_control_lt True # whether to control the loss threshold
+# fb_simple_control_ddl True # whether to control the deadline
+# fb_simple_control_lt_stepsize 0.05 # ltr in our paper
+# fb_simple_control_ddl_stepsize 0.05 # ddlr in our paper
+# fb_client_selection True # if True, fedbalancer performs client selection based on Oort, as written in Section 3.2.3 in our paper. We recommend to set this as True.
+# fb_inference_pipelining True # if True, fedbalancer clients only performs full-data inference once, when they are first selected for a round. If False, fedbalancer clients performs full-data inference at every selected round to get up-to-date sample-level loss. We recommend to set this as True.
+# noise_factor 0.5 # noise factor for differential privacy of FedBalancer
+
+# realoortbalancer # this option allows us to perform OortBalancer as described in Section 3.4. This should not be used with fedbalancer True option.
 ```
 
 ## How to parse the results after the experiment
-
-
-## Benchmark Datasets
-
-#### FEMNIST
-
-- **Overview:** Image Dataset
-- **Details:** 62 different classes (10 digits, 26 lowercase, 26 uppercase), images are 28 by 28 pixels (with option to make them all 128 by 128 pixels), 3500 users
-- **Task:** Image Classification
-
-
-
-#### Celeba
-
-- **Overview:** Image Dataset based on the [Large-scale CelebFaces Attributes Dataset](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)
-- **Details:** 9343 users (we exclude celebrities with less than 5 images)
-- **Task:** Image Classification (Smiling vs. Not smiling)
-
-
-
-#### Reddit
-
-- **Overview:** We preprocess the Reddit data released by [pushshift.io](https://files.pushshift.io/reddit/) corresponding to December 2017.
-- **Details:** 1,660,820 users with a total of 56,587,343 comments. 
-- **Task:** Next-word Prediction.
-
-
-#### Shakespeare
-
-
-#### UCI-HAR
-
+- Please refer to the jupyter notebook ipynb scripts in ```results_parsing```
 
 
 ## Notes
