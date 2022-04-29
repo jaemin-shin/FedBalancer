@@ -1,8 +1,8 @@
 # Shakespeare Dataset
 
 ## Setup Instructions
+- Run ```chmod +755 preprocess.sh``` and ```chmod +755 stat.sh``` to run the preprocessing script
 - Run preprocess.sh with a choice of the following tags:
-
   - ```-s``` := 'iid' to sample in an i.i.d. manner, or 'niid' to sample in a non-i.i.d. manner; more information on i.i.d. versus non-i.i.d. is included in the 'Notes' section
   - ```--iu``` := number of users, if i.i.d. sampling; expressed as a fraction of the total number of users; default is 0.01
   - ```--sf``` := fraction of data to sample, written as a decimal; default is 0.1
@@ -13,10 +13,8 @@
   - ```--smplseed``` := seed to be used before random sampling of data
   - ```--spltseed``` :=  seed to be used before random split of data
 
-i.e.
-- ```./preprocess.sh -s niid --sf 1.0 -k 0 -t sample -tf 0.8``` (full-sized dataset)<br/>
-- ```./preprocess.sh -s niid --sf 0.2 -k 0 -t sample -tf 0.8``` (small-sized dataset)
-('-tf 0.8' reflects the train-test split used in the [FedAvg paper](https://arxiv.org/pdf/1602.05629.pdf))
+Please run the following to generate the same dataset as ours in the FedBalancer paper experiments.
+- ```./preprocess.sh -s niid --sf 0.2 -k 0 -t user```
 
 Make sure to delete the rem_user_data, sampled_data, test, and train subfolders in the data directory before re-running preprocess.sh
 
