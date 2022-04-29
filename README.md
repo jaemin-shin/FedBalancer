@@ -169,7 +169,14 @@ noise_factor 0.5 # noise factor for differential privacy of FedBalancer
 ## How to Parse the Results After the Experiment
 - Please refer to the jupyter notebook ipynb scripts in ```results_parsing```
 - Current repository only contains jupyter notebook for ```UCI-HAR``` dataset. Other datasets will be added shortly.
-
+### UCI-HAR Results
+- FedAvg+1T: 0.61 ± 0.34 Speedup, 0.876 ± 0.011 Accuracy
+- FedAvg+2T: 0.83 ± 0.24 Speedup, 0.894 ± 0.002 Accuracy
+- FedAvg+SPC: 0.69 ± 0.12 Speedup, 0.880 ± 0.005 Accuracy
+- FedAvg+WFA: 0.83 ± 0.24 Speedup, 0.894 ± 0.002 Accuracy
+- Prox+1T: 0.93 ± 0.15 Speedup, 0.905 ± 0.008 Accuracy
+- Prox+2T: 0.83 ± 0.24 Speedup, 0.894 ± 0.002 Accuracy
+- FedBalancer: 1.37 ± 0.06 Speedup, 0.914 ± 0.005 Accuracy
 
 ## Notes
 
