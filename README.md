@@ -52,13 +52,19 @@ $ python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
 
 # FedBalancer experiment in Section 4.2 and 4.3 with random seed 0
 $ python main.py --config=configs/har/har_fedbalancer_seed0.cfg
+
+# TO RUN WITH CPU: FedAvg + 1T experiment in Section 4.2 and 4.3 with random seed 0
+$ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
+
+# TO RUN WITH CPU: FedBalancer experiment in Section 4.2 and 4.3 with random seed 0
+$ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/har/har_fedbalancer_seed0.cfg
 ```
 
 ### Running the main experiment of the paper in Section 4.2 and 4.3 at ONCE
 
 1. Go to directory of dataset `data/har` for instructions on generating the benchmark dataset
 2. Configure your python file
-3. Run (IMPORTANT NOTE: before you run the experiment, please refer to the python file that runs all the experiments in `paper_experiments`. You need to assign which GPU you will assign at each experiment, and you may need to run experiments partially as running all the experiments may exceed the VRAM of your GPU)
+3. Run (IMPORTANT NOTE: before you run the experiment, please refer to the python file that runs all the experiments in `paper_experiments`. You need to assign which GPU you will assign at each experiment, and you may need to run experiments partially as running all the experiments may exceed the VRAM of your GPU; check the available RAM if you are running the experiments on CPU.)
 ```
 $ cd models/
 
@@ -67,6 +73,12 @@ $ python ../paper_experiments/experiment_run_har_baselines.py
 
 # Run fedbalancer experiments
 $ python ../paper_experiments/experiment_run_har_fedbalancer.py
+
+# TO RUN WITH CPU: Run baseline experiments
+$ python ../paper_experiments/experiment_run_har_baselines_cpu.py
+
+# TO RUN WITH CPU: Run fedbalancer experiments
+$ python ../paper_experiments/experiment_run_har_fedbalancer_cpu.py
 ```
 
 <h3 id="config">Config File</h3>
