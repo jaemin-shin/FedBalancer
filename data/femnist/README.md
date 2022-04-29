@@ -3,6 +3,7 @@
 ## Setup Instructions
 - pip3 install numpy
 - pip3 install pillow
+- Run ```chmod +755 preprocess.sh``` and ```chmod +755 stat.sh``` to run the preprocessing script
 - Run ```./preprocess.sh``` with a choice of the following tags:
     - ```-s``` := 'iid' to sample in an i.i.d. manner, or 'niid' to sample in a non-i.i.d. manner; more information on i.i.d. versus non-i.i.d. is included in the 'Notes' section
     - ```--iu``` := number of users, if iid sampling; expressed as a fraction of the total number of users; default is 0.01
