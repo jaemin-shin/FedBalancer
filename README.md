@@ -11,7 +11,15 @@ This repository contains the code and experiments for the paper:
 
 ## System Requirements
 
-The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.14.0```, running on ```Ubuntu 18.04``` server with eight ```NVIDIA TITAN Xp``` GPUs. The experimental results on different setup and different GPUs may differ, but the results will derive same conclusions that we stated in our paper.
+The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.14.0```, running on ```Ubuntu 18.04``` server with eight ```NVIDIA TITAN Xp``` GPUs.
+
+As an alternative setup, you can use general Ubuntu servers with NVIDIA GPUs that can run tensorflow-gpu 1.14.0 with CUDA 10.0, Python 3.6.9.
+
+Note that latest NVIDIA GPUs (e.g., RTX 3090) do not support CUDA 10.0, so running FedBalancer with those GPUs are currently not available. To address this isseu, we plan to switch our system to TensorFlow 2 soon.
+
+Note that you could also run our system and experiemtns on CPUs, which could be a bit slower. How to run the experiments on CPUs are instructed below.
+
+The experimental results on different setup and different GPUs may differ, but the results will derive same conclusions that we stated in our paper.
 
 Please use ```virtualenv``` to run a self-contained setup:
 
