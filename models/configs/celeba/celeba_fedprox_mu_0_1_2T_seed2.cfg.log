@@ -1,0 +1,426 @@
+2022-04-29 11:09:27,963 - FL-type - INFO - logger init finished ---- log file: ../models/configs/celeba/celeba_fedprox_mu_0_1_2T_seed2.cfg.log
+2022-04-29 11:09:28,969 - FL-type - INFO - read config from ../models/configs/celeba/celeba_fedprox_mu_0_1_2T_seed2.cfg
+2022-04-29 11:09:28,970 - FL-type - INFO - no behavior heterogeneity! assume client is availiable at any time.
+2022-04-29 11:09:28,970 - FL-type - INFO - ================= Config =================
+2022-04-29 11:09:28,970 - FL-type - INFO - 	config_name = ../models/configs/celeba/celeba_fedprox_mu_0_1_2T_seed2.cfg
+2022-04-29 11:09:28,970 - FL-type - INFO - 	dataset = celeba
+2022-04-29 11:09:28,970 - FL-type - INFO - 	model = cnn
+2022-04-29 11:09:28,970 - FL-type - INFO - 	num_rounds = 6000
+2022-04-29 11:09:28,971 - FL-type - INFO - 	lr = 0.001
+2022-04-29 11:09:28,971 - FL-type - INFO - 	eval_every = 5
+2022-04-29 11:09:28,971 - FL-type - INFO - 	clients_per_round = 100
+2022-04-29 11:09:28,971 - FL-type - INFO - 	min_selected = 1
+2022-04-29 11:09:28,971 - FL-type - INFO - 	max_sample = 2147483647
+2022-04-29 11:09:28,971 - FL-type - INFO - 	batch_size = 10
+2022-04-29 11:09:28,971 - FL-type - INFO - 	seed = 2
+2022-04-29 11:09:28,971 - FL-type - INFO - 	num_epochs = 5
+2022-04-29 11:09:28,972 - FL-type - INFO - 	minibatch = None
+2022-04-29 11:09:28,972 - FL-type - INFO - 	round_ddl = [1000, 0]
+2022-04-29 11:09:28,972 - FL-type - INFO - 	update_frac = 0.01
+2022-04-29 11:09:28,972 - FL-type - INFO - 	max_client_num = 9223372036854775807
+2022-04-29 11:09:28,972 - FL-type - INFO - 	aggregate_algorithm = SucFedAvg
+2022-04-29 11:09:28,972 - FL-type - INFO - 	time_window = [20.0, 0.0]
+2022-04-29 11:09:28,972 - FL-type - INFO - 	user_trace = False
+2022-04-29 11:09:28,973 - FL-type - INFO - 	behav_hete = False
+2022-04-29 11:09:28,973 - FL-type - INFO - 	hard_hete = True
+2022-04-29 11:09:28,973 - FL-type - INFO - 	no_training = False
+2022-04-29 11:09:28,973 - FL-type - INFO - 	real_world = False
+2022-04-29 11:09:28,973 - FL-type - INFO - 	compress_algo = None
+2022-04-29 11:09:28,973 - FL-type - INFO - 	fedprox = True
+2022-04-29 11:09:28,973 - FL-type - INFO - 	fedprox_mu = 0.1
+2022-04-29 11:09:28,973 - FL-type - INFO - 	structure_k = None
+2022-04-29 11:09:28,974 - FL-type - INFO - 	qffl = False
+2022-04-29 11:09:28,974 - FL-type - INFO - 	qffl_q = 0
+2022-04-29 11:09:28,974 - FL-type - INFO - 	fedbalancer = False
+2022-04-29 11:09:28,974 - FL-type - INFO - 	fb_w = 1
+2022-04-29 11:09:28,974 - FL-type - INFO - 	fb_p = 0.0
+2022-04-29 11:09:28,974 - FL-type - INFO - 	fb_inference_pipelining = False
+2022-04-29 11:09:28,974 - FL-type - INFO - 	noise_factor = 0.0
+2022-04-29 11:09:28,974 - FL-type - INFO - 	fb_simple_control_lt = False
+2022-04-29 11:09:28,975 - FL-type - INFO - 	fb_simple_control_ddl = False
+2022-04-29 11:09:28,975 - FL-type - INFO - 	fb_simple_control_lt_stepsize = 0
+2022-04-29 11:09:28,975 - FL-type - INFO - 	fb_simple_control_ddl_stepsize = 0
+2022-04-29 11:09:28,975 - FL-type - INFO - 	fb_client_selection = False
+2022-04-29 11:09:28,975 - FL-type - INFO - 	oort_pacer = False
+2022-04-29 11:09:28,975 - FL-type - INFO - 	oort_pacer_delta = 10
+2022-04-29 11:09:28,975 - FL-type - INFO - 	oort_blacklist = False
+2022-04-29 11:09:28,975 - FL-type - INFO - 	oort_blacklist_rounds = 10
+2022-04-29 11:09:28,976 - FL-type - INFO - 	realoort = False
+2022-04-29 11:09:28,976 - FL-type - INFO - 	realoortbalancer = False
+2022-04-29 11:09:28,976 - FL-type - INFO - 	ddl_baseline_smartpc = False
+2022-04-29 11:09:28,976 - FL-type - INFO - 	ddl_baseline_smartpc_percentage = 0.0
+2022-04-29 11:09:28,976 - FL-type - INFO - 	ddl_baseline_fixed = True
+2022-04-29 11:09:28,976 - FL-type - INFO - 	ddl_baseline_fixed_value_multiplied_at_mean = 2.0
+2022-04-29 11:09:28,976 - FL-type - INFO - 	global_final_time = 30000
+2022-04-29 11:09:28,976 - FL-type - INFO - 	global_final_test_accuracy = 0.0
+2022-04-29 11:09:28,977 - FL-type - INFO - 	output_path = ../models/configs/celeba/
+2022-04-29 11:09:28,977 - FL-type - INFO - ================= ====== =================
+2022-04-29 11:09:28,977 - FL-type - INFO - ############################## celeba.cnn ##############################
+2022-04-29 11:09:38,958 - FL-type - INFO - model size: 124808
+2022-04-29 11:09:38,959 - FL-type - INFO - ======================Setup Clients==========================
+2022-04-29 11:09:38,968 - FL-type - INFO - Train Clients in Total: 827
+2022-04-29 11:09:38,968 - FL-type - INFO - Test Clients in Total: 92
+2022-04-29 11:09:38,975 - FL-type - INFO - set up 10 clients
+2022-04-29 11:09:38,978 - FL-type - INFO - set up 20 clients
+2022-04-29 11:09:38,981 - FL-type - INFO - set up 30 clients
+2022-04-29 11:09:38,984 - FL-type - INFO - set up 40 clients
+2022-04-29 11:09:38,987 - FL-type - INFO - set up 50 clients
+2022-04-29 11:09:38,990 - FL-type - INFO - set up 60 clients
+2022-04-29 11:09:38,993 - FL-type - INFO - set up 70 clients
+2022-04-29 11:09:38,996 - FL-type - INFO - set up 80 clients
+2022-04-29 11:09:38,999 - FL-type - INFO - set up 90 clients
+2022-04-29 11:09:39,003 - FL-type - INFO - set up 100 clients
+2022-04-29 11:09:39,006 - FL-type - INFO - set up 110 clients
+2022-04-29 11:09:39,009 - FL-type - INFO - set up 120 clients
+2022-04-29 11:09:39,012 - FL-type - INFO - set up 130 clients
+2022-04-29 11:09:39,015 - FL-type - INFO - set up 140 clients
+2022-04-29 11:09:39,018 - FL-type - INFO - set up 150 clients
+2022-04-29 11:09:39,021 - FL-type - INFO - set up 160 clients
+2022-04-29 11:09:39,024 - FL-type - INFO - set up 170 clients
+2022-04-29 11:09:39,027 - FL-type - INFO - set up 180 clients
+2022-04-29 11:09:39,030 - FL-type - INFO - set up 190 clients
+2022-04-29 11:09:39,033 - FL-type - INFO - set up 200 clients
+2022-04-29 11:09:39,036 - FL-type - INFO - set up 210 clients
+2022-04-29 11:09:39,039 - FL-type - INFO - set up 220 clients
+2022-04-29 11:09:39,043 - FL-type - INFO - set up 230 clients
+2022-04-29 11:09:39,046 - FL-type - INFO - set up 240 clients
+2022-04-29 11:09:39,049 - FL-type - INFO - set up 250 clients
+2022-04-29 11:09:39,052 - FL-type - INFO - set up 260 clients
+2022-04-29 11:09:39,055 - FL-type - INFO - set up 270 clients
+2022-04-29 11:09:39,058 - FL-type - INFO - set up 280 clients
+2022-04-29 11:09:39,061 - FL-type - INFO - set up 290 clients
+2022-04-29 11:09:39,064 - FL-type - INFO - set up 300 clients
+2022-04-29 11:09:39,067 - FL-type - INFO - set up 310 clients
+2022-04-29 11:09:39,070 - FL-type - INFO - set up 320 clients
+2022-04-29 11:09:39,073 - FL-type - INFO - set up 330 clients
+2022-04-29 11:09:39,076 - FL-type - INFO - set up 340 clients
+2022-04-29 11:09:39,079 - FL-type - INFO - set up 350 clients
+2022-04-29 11:09:39,082 - FL-type - INFO - set up 360 clients
+2022-04-29 11:09:39,085 - FL-type - INFO - set up 370 clients
+2022-04-29 11:09:39,089 - FL-type - INFO - set up 380 clients
+2022-04-29 11:09:39,092 - FL-type - INFO - set up 390 clients
+2022-04-29 11:09:39,095 - FL-type - INFO - set up 400 clients
+2022-04-29 11:09:39,098 - FL-type - INFO - set up 410 clients
+2022-04-29 11:09:39,102 - FL-type - INFO - set up 420 clients
+2022-04-29 11:09:39,105 - FL-type - INFO - set up 430 clients
+2022-04-29 11:09:39,108 - FL-type - INFO - set up 440 clients
+2022-04-29 11:09:39,111 - FL-type - INFO - set up 450 clients
+2022-04-29 11:09:39,114 - FL-type - INFO - set up 460 clients
+2022-04-29 11:09:39,117 - FL-type - INFO - set up 470 clients
+2022-04-29 11:09:39,120 - FL-type - INFO - set up 480 clients
+2022-04-29 11:09:39,123 - FL-type - INFO - set up 490 clients
+2022-04-29 11:09:39,126 - FL-type - INFO - set up 500 clients
+2022-04-29 11:09:39,130 - FL-type - INFO - set up 510 clients
+2022-04-29 11:09:39,133 - FL-type - INFO - set up 520 clients
+2022-04-29 11:09:39,136 - FL-type - INFO - set up 530 clients
+2022-04-29 11:09:39,139 - FL-type - INFO - set up 540 clients
+2022-04-29 11:09:39,142 - FL-type - INFO - set up 550 clients
+2022-04-29 11:09:39,145 - FL-type - INFO - set up 560 clients
+2022-04-29 11:09:39,148 - FL-type - INFO - set up 570 clients
+2022-04-29 11:09:39,151 - FL-type - INFO - set up 580 clients
+2022-04-29 11:09:39,154 - FL-type - INFO - set up 590 clients
+2022-04-29 11:09:39,157 - FL-type - INFO - set up 600 clients
+2022-04-29 11:09:39,160 - FL-type - INFO - set up 610 clients
+2022-04-29 11:09:39,163 - FL-type - INFO - set up 620 clients
+2022-04-29 11:09:39,167 - FL-type - INFO - set up 630 clients
+2022-04-29 11:09:39,170 - FL-type - INFO - set up 640 clients
+2022-04-29 11:09:39,173 - FL-type - INFO - set up 650 clients
+2022-04-29 11:09:39,176 - FL-type - INFO - set up 660 clients
+2022-04-29 11:09:39,179 - FL-type - INFO - set up 670 clients
+2022-04-29 11:09:39,182 - FL-type - INFO - set up 680 clients
+2022-04-29 11:09:39,185 - FL-type - INFO - set up 690 clients
+2022-04-29 11:09:39,189 - FL-type - INFO - set up 700 clients
+2022-04-29 11:09:39,192 - FL-type - INFO - set up 710 clients
+2022-04-29 11:09:39,195 - FL-type - INFO - set up 720 clients
+2022-04-29 11:09:39,198 - FL-type - INFO - set up 730 clients
+2022-04-29 11:09:39,201 - FL-type - INFO - set up 740 clients
+2022-04-29 11:09:39,204 - FL-type - INFO - set up 750 clients
+2022-04-29 11:09:39,207 - FL-type - INFO - set up 760 clients
+2022-04-29 11:09:39,210 - FL-type - INFO - set up 770 clients
+2022-04-29 11:09:39,214 - FL-type - INFO - set up 780 clients
+2022-04-29 11:09:39,217 - FL-type - INFO - set up 790 clients
+2022-04-29 11:09:39,220 - FL-type - INFO - set up 800 clients
+2022-04-29 11:09:39,223 - FL-type - INFO - set up 810 clients
+2022-04-29 11:09:39,226 - FL-type - INFO - set up 820 clients
+2022-04-29 11:09:39,331 - FL-type - INFO - Timer cached in cached_timers.json
+2022-04-29 11:09:39,332 - FL-type - INFO - device setup result: defaultdict(<class 'int'>, {'Google Nexus S': 458, 'Xiaomi Redmi Note 7 Pro': 366, 'Google Pixel 4': 3})
+2022-04-29 11:09:39,384 - FL-type - INFO - ===================== Random Initialization =====================
+2022-04-29 11:09:39,384 - FL-type - INFO - ===================== Round 1 of 6000 =====================
+2022-04-29 11:09:39,384 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:09:39,385 - FL-type - INFO - current time: 0	time window: 20.0	
+2022-04-29 11:09:39,385 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:09:39,387 - FL-type - INFO - selected num: 100
+2022-04-29 11:09:39,387 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:09:39,388 - FL-type - INFO - this round deadline 88
+2022-04-29 11:10:18,173 - FL-type - INFO - average acc: 0.9855397408963588, average loss: 0.07132073541699128
+2022-04-29 11:10:18,174 - FL-type - INFO - configuration and update stage simulation time: 86.10988724694616
+2022-04-29 11:10:18,174 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:10:18,175 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:10:18,175 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:10:18,175 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:10:18,196 - FL-type - INFO - ===================== Round 2 of 6000 =====================
+2022-04-29 11:10:18,197 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:10:18,197 - FL-type - INFO - current time: 106.10988724694616	time window: 20.0	
+2022-04-29 11:10:18,198 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:10:18,200 - FL-type - INFO - selected num: 100
+2022-04-29 11:10:18,200 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:10:18,200 - FL-type - INFO - this round deadline 88
+2022-04-29 11:10:53,391 - FL-type - INFO - average acc: 0.9932141944900565, average loss: 0.055104038233730536
+2022-04-29 11:10:53,392 - FL-type - INFO - configuration and update stage simulation time: 79.8400784712094
+2022-04-29 11:10:53,392 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:10:53,392 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:10:53,393 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:10:53,393 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:10:53,413 - FL-type - INFO - ===================== Round 3 of 6000 =====================
+2022-04-29 11:10:53,414 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:10:53,414 - FL-type - INFO - current time: 205.94996571815557	time window: 20.0	
+2022-04-29 11:10:53,415 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:10:53,417 - FL-type - INFO - selected num: 100
+2022-04-29 11:10:53,417 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:10:53,418 - FL-type - INFO - this round deadline 88
+2022-04-29 11:11:28,067 - FL-type - INFO - average acc: 0.9873863636363638, average loss: 0.06969063282129355
+2022-04-29 11:11:28,068 - FL-type - INFO - configuration and update stage simulation time: 71.16597812625686
+2022-04-29 11:11:28,068 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:11:28,068 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:11:28,068 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:11:28,069 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:11:28,088 - FL-type - INFO - ===================== Round 4 of 6000 =====================
+2022-04-29 11:11:28,088 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:11:28,089 - FL-type - INFO - current time: 297.1159438444124	time window: 20.0	
+2022-04-29 11:11:28,090 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:11:28,092 - FL-type - INFO - selected num: 100
+2022-04-29 11:11:28,092 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:11:28,092 - FL-type - INFO - this round deadline 88
+2022-04-29 11:12:04,647 - FL-type - INFO - average acc: 0.9879684223822154, average loss: 0.07689836272329557
+2022-04-29 11:12:04,648 - FL-type - INFO - configuration and update stage simulation time: 71.13039220610702
+2022-04-29 11:12:04,648 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:12:04,649 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:12:04,649 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:12:04,649 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:12:04,670 - FL-type - INFO - ===================== Round 5 of 6000 =====================
+2022-04-29 11:12:04,671 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:12:04,671 - FL-type - INFO - current time: 388.2463360505194	time window: 20.0	
+2022-04-29 11:12:04,672 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:12:04,674 - FL-type - INFO - selected num: 100
+2022-04-29 11:12:04,674 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:12:04,675 - FL-type - INFO - this round deadline 88
+2022-04-29 11:12:42,193 - FL-type - INFO - average acc: 0.9903938709216819, average loss: 0.05972427298838738
+2022-04-29 11:12:42,193 - FL-type - INFO - configuration and update stage simulation time: 71.26375581267251
+2022-04-29 11:12:42,194 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:12:42,194 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:12:42,194 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:12:42,194 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:12:42,220 - FL-type - INFO - --------------------- test result ---------------------
+2022-04-29 11:12:47,086 - FL-type - INFO - test_accuracy: 0.5940282870612886, 10th percentile: 0.41103896103896104, 50th percentile: 0.5847701149425287, 90th percentile 0.7666666666666667
+2022-04-29 11:12:47,087 - FL-type - INFO - test_loss: 0.7235168545361025, 10th percentile: 0.5001182854175568, 50th percentile: 0.7294148802757263, 90th percentile 0.9733659982681275
+2022-04-29 11:12:47,087 - FL-type - INFO - ===================== Round 6 of 6000 =====================
+2022-04-29 11:12:47,087 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:12:47,088 - FL-type - INFO - current time: 479.5100918631919	time window: 20.0	
+2022-04-29 11:12:47,089 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:12:47,093 - FL-type - INFO - selected num: 100
+2022-04-29 11:12:47,093 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:12:47,094 - FL-type - INFO - this round deadline 88
+2022-04-29 11:13:21,648 - FL-type - INFO - average acc: 0.9951489612336689, average loss: 0.05168726560659707
+2022-04-29 11:13:21,648 - FL-type - INFO - configuration and update stage simulation time: 71.15657405697057
+2022-04-29 11:13:21,648 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:13:21,649 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:13:21,649 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:13:21,649 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:13:21,670 - FL-type - INFO - ===================== Round 7 of 6000 =====================
+2022-04-29 11:13:21,670 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:13:21,670 - FL-type - INFO - current time: 570.6666659201625	time window: 20.0	
+2022-04-29 11:13:21,671 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:13:21,673 - FL-type - INFO - selected num: 100
+2022-04-29 11:13:21,673 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:13:21,674 - FL-type - INFO - this round deadline 88
+2022-04-29 11:13:56,847 - FL-type - INFO - average acc: 0.9952101002445828, average loss: 0.053966688851214716
+2022-04-29 11:13:56,848 - FL-type - INFO - configuration and update stage simulation time: 71.29428873295483
+2022-04-29 11:13:56,848 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:13:56,849 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:13:56,849 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:13:56,849 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:13:56,869 - FL-type - INFO - ===================== Round 8 of 6000 =====================
+2022-04-29 11:13:56,870 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:13:56,870 - FL-type - INFO - current time: 661.9609546531173	time window: 20.0	
+2022-04-29 11:13:56,871 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:13:56,873 - FL-type - INFO - selected num: 100
+2022-04-29 11:13:56,874 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:13:56,874 - FL-type - INFO - this round deadline 88
+2022-04-29 11:14:33,980 - FL-type - INFO - average acc: 0.9957345872518287, average loss: 0.05349006711738184
+2022-04-29 11:14:33,981 - FL-type - INFO - configuration and update stage simulation time: 70.71973884557873
+2022-04-29 11:14:33,982 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:14:33,982 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:14:33,982 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:14:33,982 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:14:34,007 - FL-type - INFO - ===================== Round 9 of 6000 =====================
+2022-04-29 11:14:34,007 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:14:34,008 - FL-type - INFO - current time: 752.680693498696	time window: 20.0	
+2022-04-29 11:14:34,009 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:14:34,011 - FL-type - INFO - selected num: 100
+2022-04-29 11:14:34,011 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:14:34,011 - FL-type - INFO - this round deadline 88
+2022-04-29 11:15:08,149 - FL-type - INFO - average acc: 0.9978351084198159, average loss: 0.04101251996937208
+2022-04-29 11:15:08,150 - FL-type - INFO - configuration and update stage simulation time: 71.23836783980799
+2022-04-29 11:15:08,150 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:15:08,150 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:15:08,150 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:15:08,151 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:15:08,173 - FL-type - INFO - ===================== Round 10 of 6000 =====================
+2022-04-29 11:15:08,173 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:15:08,173 - FL-type - INFO - current time: 843.919061338504	time window: 20.0	
+2022-04-29 11:15:08,174 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:15:08,178 - FL-type - INFO - selected num: 100
+2022-04-29 11:15:08,178 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:15:08,178 - FL-type - INFO - this round deadline 88
+2022-04-29 11:15:44,417 - FL-type - INFO - average acc: 0.9990000000000001, average loss: 0.03903088535531424
+2022-04-29 11:15:44,418 - FL-type - INFO - configuration and update stage simulation time: 65.74750550187008
+2022-04-29 11:15:44,418 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:15:44,419 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:15:44,419 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:15:44,419 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:15:44,443 - FL-type - INFO - --------------------- test result ---------------------
+2022-04-29 11:15:49,214 - FL-type - INFO - test_accuracy: 0.6563645887899424, 10th percentile: 0.4484482758620689, 50th percentile: 0.64, 90th percentile 0.8333333333333334
+2022-04-29 11:15:49,215 - FL-type - INFO - test_loss: 0.666156690397957, 10th percentile: 0.4141658961772919, 50th percentile: 0.6853662133216858, 90th percentile 1.0151886343955994
+2022-04-29 11:15:49,215 - FL-type - INFO - ===================== Round 11 of 6000 =====================
+2022-04-29 11:15:49,215 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:15:49,215 - FL-type - INFO - current time: 929.6665668403741	time window: 20.0	
+2022-04-29 11:15:49,216 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:15:49,218 - FL-type - INFO - selected num: 100
+2022-04-29 11:15:49,219 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:15:49,219 - FL-type - INFO - this round deadline 88
+2022-04-29 11:16:26,335 - FL-type - INFO - average acc: 0.9962121212121212, average loss: 0.04419929215218872
+2022-04-29 11:16:26,335 - FL-type - INFO - configuration and update stage simulation time: 71.13039220610702
+2022-04-29 11:16:26,336 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:16:26,336 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:16:26,336 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:16:26,336 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:16:26,361 - FL-type - INFO - ===================== Round 12 of 6000 =====================
+2022-04-29 11:16:26,362 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:16:26,362 - FL-type - INFO - current time: 1020.7969590464811	time window: 20.0	
+2022-04-29 11:16:26,363 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:16:26,367 - FL-type - INFO - selected num: 100
+2022-04-29 11:16:26,367 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:16:26,367 - FL-type - INFO - this round deadline 88
+2022-04-29 11:17:01,957 - FL-type - INFO - average acc: 0.9961486789072995, average loss: 0.04206814007135108
+2022-04-29 11:17:01,957 - FL-type - INFO - configuration and update stage simulation time: 70.7456540274045
+2022-04-29 11:17:01,958 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:17:01,958 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:17:01,958 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:17:01,959 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:17:01,987 - FL-type - INFO - ===================== Round 13 of 6000 =====================
+2022-04-29 11:17:01,987 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:17:01,988 - FL-type - INFO - current time: 1111.5426130738856	time window: 20.0	
+2022-04-29 11:17:01,989 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:17:01,991 - FL-type - INFO - selected num: 100
+2022-04-29 11:17:01,991 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:17:01,992 - FL-type - INFO - this round deadline 88
+2022-04-29 11:17:38,561 - FL-type - INFO - average acc: 0.9986363636363635, average loss: 0.038539296071976425
+2022-04-29 11:17:38,562 - FL-type - INFO - configuration and update stage simulation time: 71.26003367026647
+2022-04-29 11:17:38,562 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:17:38,562 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:17:38,563 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:17:38,563 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:17:38,583 - FL-type - INFO - ===================== Round 14 of 6000 =====================
+2022-04-29 11:17:38,583 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:17:38,583 - FL-type - INFO - current time: 1202.802646744152	time window: 20.0	
+2022-04-29 11:17:38,584 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:17:38,586 - FL-type - INFO - selected num: 100
+2022-04-29 11:17:38,587 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:17:38,587 - FL-type - INFO - this round deadline 88
+2022-04-29 11:18:15,085 - FL-type - INFO - average acc: 0.9966363636363638, average loss: 0.041990618123672906
+2022-04-29 11:18:15,085 - FL-type - INFO - configuration and update stage simulation time: 71.25484477360924
+2022-04-29 11:18:15,086 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:18:15,086 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:18:15,086 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:18:15,086 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:18:15,104 - FL-type - INFO - ===================== Round 15 of 6000 =====================
+2022-04-29 11:18:15,104 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:18:15,104 - FL-type - INFO - current time: 1294.0574915177613	time window: 20.0	
+2022-04-29 11:18:15,105 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:18:15,107 - FL-type - INFO - selected num: 100
+2022-04-29 11:18:15,107 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:18:15,107 - FL-type - INFO - this round deadline 88
+2022-04-29 11:18:49,141 - FL-type - INFO - average acc: 0.9980833333333332, average loss: 0.036529156769393015
+2022-04-29 11:18:49,141 - FL-type - INFO - configuration and update stage simulation time: 70.74565279938021
+2022-04-29 11:18:49,142 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:18:49,142 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:18:49,143 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:18:49,143 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:18:49,170 - FL-type - INFO - --------------------- test result ---------------------
+2022-04-29 11:18:54,009 - FL-type - INFO - test_accuracy: 0.6987951807228916, 10th percentile: 0.502, 50th percentile: 0.6923076923076923, 90th percentile 0.8666666666666667
+2022-04-29 11:18:54,010 - FL-type - INFO - test_loss: 0.6067190406645949, 10th percentile: 0.3938351005315781, 50th percentile: 0.6027929484844208, 90th percentile 0.9045185625553133
+2022-04-29 11:18:54,010 - FL-type - INFO - ===================== Round 16 of 6000 =====================
+2022-04-29 11:18:54,010 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:18:54,010 - FL-type - INFO - current time: 1384.8031443171415	time window: 20.0	
+2022-04-29 11:18:54,011 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:18:54,013 - FL-type - INFO - selected num: 100
+2022-04-29 11:18:54,013 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:18:54,014 - FL-type - INFO - this round deadline 88
+2022-04-29 11:19:31,074 - FL-type - INFO - average acc: 0.9978694581280788, average loss: 0.03388742681068834
+2022-04-29 11:19:31,074 - FL-type - INFO - configuration and update stage simulation time: 71.40970628797298
+2022-04-29 11:19:31,075 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:19:31,075 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:19:31,075 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:19:31,075 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:19:31,094 - FL-type - INFO - ===================== Round 17 of 6000 =====================
+2022-04-29 11:19:31,095 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:19:31,095 - FL-type - INFO - current time: 1476.2128506051145	time window: 20.0	
+2022-04-29 11:19:31,096 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:19:31,098 - FL-type - INFO - selected num: 100
+2022-04-29 11:19:31,098 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:19:31,099 - FL-type - INFO - this round deadline 88
+2022-04-29 11:20:06,324 - FL-type - INFO - average acc: 0.9956048663979697, average loss: 0.03611954661842901
+2022-04-29 11:20:06,325 - FL-type - INFO - configuration and update stage simulation time: 78.53269825896733
+2022-04-29 11:20:06,325 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:20:06,325 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:20:06,325 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:20:06,325 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:20:06,348 - FL-type - INFO - ===================== Round 18 of 6000 =====================
+2022-04-29 11:20:06,348 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:20:06,348 - FL-type - INFO - current time: 1574.7455488640817	time window: 20.0	
+2022-04-29 11:20:06,349 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:20:06,352 - FL-type - INFO - selected num: 100
+2022-04-29 11:20:06,352 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:20:06,352 - FL-type - INFO - this round deadline 88
+2022-04-29 11:20:42,641 - FL-type - INFO - average acc: 0.9957359307359306, average loss: 0.041557165973354133
+2022-04-29 11:20:42,642 - FL-type - INFO - configuration and update stage simulation time: 71.09524762750956
+2022-04-29 11:20:42,642 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:20:42,643 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:20:42,643 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:20:42,643 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:20:42,665 - FL-type - INFO - ===================== Round 19 of 6000 =====================
+2022-04-29 11:20:42,665 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:20:42,666 - FL-type - INFO - current time: 1665.8407964915912	time window: 20.0	
+2022-04-29 11:20:42,666 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:20:42,669 - FL-type - INFO - selected num: 100
+2022-04-29 11:20:42,669 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:20:42,670 - FL-type - INFO - this round deadline 88
+2022-04-29 11:21:19,429 - FL-type - INFO - average acc: 0.9993333333333334, average loss: 0.03086139068705961
+2022-04-29 11:21:19,430 - FL-type - INFO - configuration and update stage simulation time: 71.2375270220052
+2022-04-29 11:21:19,430 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:21:19,431 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:21:19,431 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:21:19,431 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:21:19,454 - FL-type - INFO - ===================== Round 20 of 6000 =====================
+2022-04-29 11:21:19,454 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:21:19,454 - FL-type - INFO - current time: 1757.0783235135964	time window: 20.0	
+2022-04-29 11:21:19,455 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:21:19,458 - FL-type - INFO - selected num: 100
+2022-04-29 11:21:19,458 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:21:19,458 - FL-type - INFO - this round deadline 88
+2022-04-29 11:21:55,634 - FL-type - INFO - average acc: 1.0, average loss: 0.028088856425019914
+2022-04-29 11:21:55,634 - FL-type - INFO - configuration and update stage simulation time: 81.73516075343844
+2022-04-29 11:21:55,635 - FL-type - INFO - --------------------- report stage ---------------------
+2022-04-29 11:21:55,635 - FL-type - INFO - 100 of 100 clients upload successfully
+2022-04-29 11:21:55,635 - FL-type - INFO - round succeed, updating global model...
+2022-04-29 11:21:55,635 - FL-type - INFO - Aggragate with SucFedAvg
+2022-04-29 11:21:55,653 - FL-type - INFO - --------------------- test result ---------------------
+2022-04-29 11:22:00,430 - FL-type - INFO - test_accuracy: 0.7260345730749084, 10th percentile: 0.5247619047619048, 50th percentile: 0.7272727272727273, 90th percentile 0.8692753623188406
+2022-04-29 11:22:00,431 - FL-type - INFO - test_loss: 0.5601246754276371, 10th percentile: 0.35191599428653714, 50th percentile: 0.5657543540000916, 90th percentile 0.8430001676082612
+2022-04-29 11:22:00,432 - FL-type - INFO - ===================== Round 21 of 6000 =====================
+2022-04-29 11:22:00,432 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-04-29 11:22:00,432 - FL-type - INFO - current time: 1858.8134842670347	time window: 20.0	
+2022-04-29 11:22:00,433 - FL-type - INFO - 827 of 827 clients online
+2022-04-29 11:22:00,437 - FL-type - INFO - selected num: 100
+2022-04-29 11:22:00,438 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-04-29 11:22:00,438 - FL-type - INFO - this round deadline 88

@@ -32,10 +32,6 @@ fedbalancer_lines = [
 ]
 
 process_count = 0
-gpu_id = {}
-gpu_id[0] = 0
-gpu_id[1] = 0
-gpu_id[2] = 0
 
 process_count = 0
 
@@ -48,5 +44,5 @@ for seed in range(3):
             new_config_file.write(line+'\n')
         new_config_file.write('seed '+str(seed)+'\n')
         new_config_file.close()
-        os.system('CUDA_VISIBLE_DEVICES='+str(gpu_id[process_count])+' python ../models/main.py --config=../models/configs/har/har_'+exp[0][0]+'_seed'+str(seed)+'.cfg &')
+        os.system('CUDA_VISIBLE_DEVICES=-1 python ../models/main.py --config=../models/configs/har/har_'+exp[0][0]+'_seed'+str(seed)+'.cfg &')
         process_count += 1

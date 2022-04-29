@@ -19,28 +19,24 @@ config_lines = [
 'aggregate_algorithm SucFedAvg',
 'num_epochs 5',
 'output_path ../models/configs/har/',
-'fedbalancer True',
-'fb_simple_control_lt True',
-'fb_simple_control_ddl True',
-'fb_inference_pipelining True',
-'fb_client_selection True',
 'global_final_time 500000']
 
 
-fedbalancer_lines = [
-(['fedbalancer'], ['fb_w 20', 'fb_simple_control_lt_stepsize 0.05', 'fb_simple_control_ddl_stepsize 0.05', 'fb_p 1.0'])
+baseline_lines = [
+(['fedavg_1T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 1.0']),
+(['fedavg_2T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 2.0']),
+(['fedavg_SPC'], ['ddl_baseline_smartpc True', 'ddl_baseline_smartpc_percentage 0.8']),
+(['fedavg_WFA'], ['ddl_baseline_smartpc True', 'ddl_baseline_smartpc_percentage 1.0']),
+(['fedprox_mu_0_0_1T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 1.0', 'fedprox True', 'fedprox_mu 0.0']),
+(['fedprox_mu_0_0_2T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 2.0', 'fedprox True', 'fedprox_mu 0.0']),
 ]
 
 process_count = 0
-gpu_id = {}
-gpu_id[0] = 0
-gpu_id[1] = 0
-gpu_id[2] = 0
 
 process_count = 0
 
 for seed in range(3):
-    for exp in fedbalancer_lines:
+    for exp in baseline_lines:
         new_config_file = open('../models/configs/har/har_'+exp[0][0]+'_seed'+str(seed)+'.cfg', 'w')
         for line in config_lines:
             new_config_file.write(line+'\n')
@@ -48,5 +44,5 @@ for seed in range(3):
             new_config_file.write(line+'\n')
         new_config_file.write('seed '+str(seed)+'\n')
         new_config_file.close()
-        os.system('CUDA_VISIBLE_DEVICES='+str(gpu_id[process_count])+' python ../models/main.py --config=../models/configs/har/har_'+exp[0][0]+'_seed'+str(seed)+'.cfg &')
+        os.system('CUDA_VISIBLE_DEVICES=-1 python ../models/main.py --config=../models/configs/har/har_'+exp[0][0]+'_seed'+str(seed)+'.cfg &')
         process_count += 1

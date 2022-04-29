@@ -45,11 +45,6 @@ class ClientModel(Model):
         eval_metric_ops = tf.count_nonzero(
             tf.equal(label_ph, tf.argmax(input=logits, axis=1)))
         batch_gradients = []
-        # batch_gradients = [tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[0])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[1])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[2])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[3])]),
-        # tf.global_norm([grad for grad, variable in self.optimizer.compute_gradients(loss_list[4])])]
         return input_ph, label_ph, minimize_op, eval_metric_ops, tf.math.reduce_mean(loss_list), loss_list, flag_training, batch_gradients
 
     def process_x(self, raw_x_batch):
