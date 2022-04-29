@@ -14,9 +14,8 @@
     - ```--smplseed``` := seed to be used before random sampling of data
     - ```--spltseed``` :=  seed to be used before random split of data
 
-i.e.
-- ```./preprocess.sh -s niid --sf 1.0 -k 0 -t sample``` (full-sized dataset)<br/>
-- ```./preprocess.sh -s niid --sf 0.05 -k 0 -t sample``` (small-sized dataset)
+Please run the following to generate the same dataset as ours in the FedBalancer paper experiments.
+- ```./preprocess.sh -s niid --sf 0.2 -k 0 -t user```
 
 Make sure to delete the rem_user_data, sampled_data, test, and train subfolders in the data directory before re-running preprocess.sh
 
