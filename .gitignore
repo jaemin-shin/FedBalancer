@@ -19,3 +19,6 @@ _templates/
 
 data/har/data/*
 data/celeba/data/*
+data/femnist/data/*
+data/reddit/data/*
+data/shakespeare/data/*
