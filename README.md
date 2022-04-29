@@ -34,7 +34,7 @@ $ pip install -r requirements.txt
 
 We evaluated based on five datasets: ```FEMNIST```, ```Celeba```, ```Reddit```, ```Shakespeare```, ```UCI-HAR```.
 
-Currently, this repository only supports experiments with ```UCI-HAR```.
+Currently, this repository only supports experiments with ```Celeba``` and ```UCI-HAR```.
 
 Handling other datasets will be added soon.
 
@@ -42,27 +42,31 @@ Handling other datasets will be added soon.
 
 ### Running the main experiment of the paper in Section 4.2 and 4.3 one by one
 
-1. Go to directory of dataset `data/har` for instructions on generating the benchmark dataset
-2. Run (please refer to the list of config files in ```configs/har```, it contains all the config files for the experiment)
+1. Go to directory of respective dataset in `data/` for instructions on generating the benchmark dataset
+2. Run (please refer to the list of config files in the subdirectory with respective dataset name in ```configs/```, it contains all the config files for the experiment)
 ```
 $ cd models/
 
 # FedAvg + 1T experiment in Section 4.2 and 4.3 with random seed 0
 $ python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
+$ python main.py --config=configs/celeba/celeba_fedavg_1T_seed0.cfg
 
 # FedBalancer experiment in Section 4.2 and 4.3 with random seed 0
 $ python main.py --config=configs/har/har_fedbalancer_seed0.cfg
+$ python main.py --config=configs/celeba/celeba_fedbalancer_seed0.cfg
 
 # TO RUN WITH CPU: FedAvg + 1T experiment in Section 4.2 and 4.3 with random seed 0
 $ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
+$ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/celeba/celeba_fedavg_1T_seed0.cfg
 
 # TO RUN WITH CPU: FedBalancer experiment in Section 4.2 and 4.3 with random seed 0
 $ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/har/har_fedbalancer_seed0.cfg
+$ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/celeba/celeba_fedbalancer_seed0.cfg
 ```
 
 ### Running the main experiment of the paper in Section 4.2 and 4.3 at ONCE
 
-1. Go to directory of dataset `data/har` for instructions on generating the benchmark dataset
+1. Go to directory of respective dataset in `data/` for instructions on generating the benchmark dataset
 2. Configure your python file
 3. Run (IMPORTANT NOTE: before you run the experiment, please refer to the python file that runs all the experiments in `paper_experiments`. You need to assign which GPU you will assign at each experiment, and you may need to run experiments partially as running all the experiments may exceed the VRAM of your GPU; check the available RAM if you are running the experiments on CPU.)
 ```
@@ -70,15 +74,19 @@ $ cd models/
 
 # Run baseline experiments
 $ python ../paper_experiments/experiment_run_har_baselines.py
+$ python ../paper_experiments/experiment_run_celeba_baselines.py
 
 # Run fedbalancer experiments
 $ python ../paper_experiments/experiment_run_har_fedbalancer.py
+$ python ../paper_experiments/experiment_run_celeba_fedbalancer.py
 
 # TO RUN WITH CPU: Run baseline experiments
 $ python ../paper_experiments/experiment_run_har_baselines_cpu.py
+$ python ../paper_experiments/experiment_run_celeba_baselines_cpu.py
 
 # TO RUN WITH CPU: Run fedbalancer experiments
 $ python ../paper_experiments/experiment_run_har_fedbalancer_cpu.py
+$ python ../paper_experiments/experiment_run_celeba_fedbalancer_cpu.py
 ```
 
 <h3 id="config">Config File</h3>
@@ -160,6 +168,7 @@ noise_factor 0.5 # noise factor for differential privacy of FedBalancer
 
 ## How to Parse the Results After the Experiment
 - Please refer to the jupyter notebook ipynb scripts in ```results_parsing```
+- Current repository only contains jupyter notebook for ```UCI-HAR``` dataset. Other datasets will be added shortly.
 
 
 ## Notes
