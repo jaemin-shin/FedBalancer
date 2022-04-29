@@ -1,0 +1,2 @@
+model_checkpoint_path: "celeba_fedavg_2T_seed0.ckpt"
+all_model_checkpoint_paths: "celeba_fedavg_2T_seed0.ckpt"

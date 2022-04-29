@@ -6,6 +6,7 @@
 *.meta
 *.index
 *.data-00000-of-00001
+*ipynb_checkpoints*
 
 models/__pycache__/
 models/*/__pycache__/
