@@ -14,6 +14,4 @@ We also remove users and comments that simple heuristics or preliminary inspecti
 ## Setup Instructions
 
 1. To use our reference model, download the data [here](https://drive.google.com/file/d/1PwBpAEMYKNpnv64cQ2TIQfSc_vPbq3OQ/view?usp=sharing) into a ```data``` subfolder in this directory. This is a subsampled version of the complete data. Our reference implementation doesn't yet support training on the [complete dataset](https://drive.google.com/file/d/1lT1Z0N1weG-oA2PgC1Jak_WQ6h3bu7V_/view?usp=sharing), as it loads all given clients into memory.
-2. With the data in the appropriate directory, run build the training vocabulary by running ```python build_vocab.py --data-dir ./data/train --target-dir vocab```. 
-3. With the data and the training vocabulary, you can now run our reference implementation in the ```models``` directory using a command as the following:
-  - ```python3 main.py -dataset reddit -model stacked_lstm --eval-every 10 --num-rounds 100 --clients-per-round 10 --batch-size 5 -lr 5.65 --metrics-name reddit_experiment```
+2. With the data in the appropriate directory, run build the training vocabulary by running ```python build_vocab.py --data-dir ./data/train --target-dir vocab```.
