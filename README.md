@@ -11,32 +11,102 @@ This repository contains the code and experiments for the paper:
 
 ## System Requirements
 
-The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.14.0```, running on ```Ubuntu 18.04``` server with eight ```NVIDIA TITAN Xp``` GPUs.
+The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.15.4```, running on ```Ubuntu 18.04``` server with eight ```NVIDIA TITAN Xp``` GPUs.
 
-As an alternative setup, you can use general Ubuntu servers with NVIDIA GPUs that can run tensorflow-gpu 1.14.0 with CUDA 10.0, Python 3.6.9.
-
-Note that latest NVIDIA GPUs (e.g., RTX 3090) do not support CUDA 10.0, so running FedBalancer with those GPUs are currently not available. To address this isseu, we plan to switch our system to TensorFlow 2 soon.
+As an alternative setup, you can use general Ubuntu servers with NVIDIA GPUs.
 
 Note that you could also run our system and experiemtns on CPUs, which could be a bit slower. How to run the experiments on CPUs are instructed below.
 
 The experimental results on different setup and different GPUs may differ, but the results will derive same conclusions that we stated in our paper.
 
-Please use ```virtualenv``` to run a self-contained setup:
+## System Installation
+
+Please use ```conda``` to run a self-contained setup:
+
+### Update your NVIDIA driver
+The following is to update your driver. If you already have installed the required drivers, this step could be skipped. Be sure to have NVIDIA drivers up-to-date.
+
+After running the commands below, run "nvidia-smi" to confirm your update and check that it is on the 11.1 (or newer) CUDA runtime.
+
+```
+$ sudo apt-get dist-upgrade
+$ sudo shudown -r now
+$ sudo apt-get install dkms build-essential
+$ sudo add-apt-repository ppa:graphics-drivers/ppa
+$ sudo apt-get install nvidia-driver-455
+$ sudo shutdown -r now
+```
+
+### Install miniconda on your system
+
+```
+$ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+$ bash Miniconda3-latest-Linux-x86_64.sh
+$ conda update conda
+$ conda update --all
+```
+
+### Setup a conda env to install NVIDIA's build of TensorFlow 1.15
+
+```
+$ conda create --name fb-conda python=3.6
+$ conda activate fb-conda
+$ conda install pip
+```
+
+### Create a local index for the "wheel" and supporting dependencies
+
+```pip``` will be used for the installing required packages, but the NVIDIA package index is not available on PyPI.org. Please run the following command to set up the index (you should be in activated fb-conda env)
+
+```
+$ pip install --user nvidia-pyindex
+```
+
+Then, add ```export PATH=$PATH:$HOME/.local/bin``` to your .bashrc file to let new index be recognized by the system. Please re-activate your bash by running the following:
+
+```
+$ source ~/.bashrc
+```
+
+If you are running other kind of shell like ```zsh```, the above commands should be changed accordingly.
+
+### Install the NVIDIA TensorFlow Build
+
+Run the following while being in the activated fb-conda env.
+
+```
+$ conda install -c conda-forge openmpi
+```
+
+Add the following to the .bashrc file ```export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/miniconda3/envs/fb-conda/lib/``` and re-activate the bash by running the following:
+
+```
+$ source ~/.bashrc
+```
+
+Then, with the fb-conda env being activated, use the following command to install the ```NVIDIA Tensorflow 1.15``` with ```pip```.
+
+```
+$ pip install --user nvidia-tensorflow[horovod]
+```
+
+### Install other dependencies
+
+To install other dependencies, please run the following:
 
 ```
 $ git clone https://github.com/jaemin-shin/FedBalancer.git
-$ virtualenv ./fedbalancer-venv -p python3.6
-$ source ./fedbalancer-venv/bin/activate
+$ cd FedBalancer
 $ pip install -r requirements.txt
 ```
 
-## Important Note
+<!-- ## Important Note
 
 We evaluated based on five datasets: ```FEMNIST```, ```Celeba```, ```Reddit```, ```Shakespeare```, ```UCI-HAR```.
 
 Currently, this repository only supports experiments with ```Celeba``` and ```UCI-HAR```.
 
-Handling other datasets will be added soon.
+Handling other datasets will be added soon. -->
 
 ## How to Run the Experiments
 
@@ -48,45 +118,39 @@ Handling other datasets will be added soon.
 $ cd models/
 
 # FedAvg + 1T experiment in Section 4.2 and 4.3 with random seed 0
-$ python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
-$ python main.py --config=configs/celeba/celeba_fedavg_1T_seed0.cfg
+# candidate {dataset_name}: femnist/celeba/reddit/shakespeare/har
+
+$ python main.py --config=configs/{dataset_name}/{dataset_name}_fedavg_1T_seed0.cfg
+# example: python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
 
 # FedBalancer experiment in Section 4.2 and 4.3 with random seed 0
-$ python main.py --config=configs/har/har_fedbalancer_seed0.cfg
-$ python main.py --config=configs/celeba/celeba_fedbalancer_seed0.cfg
+# candidate {dataset_name}: femnist/celeba/reddit/shakespeare/har
 
-# TO RUN WITH CPU: FedAvg + 1T experiment in Section 4.2 and 4.3 with random seed 0
-$ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
-$ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/celeba/celeba_fedavg_1T_seed0.cfg
-
-# TO RUN WITH CPU: FedBalancer experiment in Section 4.2 and 4.3 with random seed 0
-$ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/har/har_fedbalancer_seed0.cfg
-$ CUDA_VISIBLE_DEVICES=-1 python main.py --config=configs/celeba/celeba_fedbalancer_seed0.cfg
+$ python main.py --config=configs/{dataset_name}/{dataset_name}_fedbalancer_seed0.cfg
+# example: python main.py --config=configs/har/har_fedbalancer_seed0.cfg
 ```
+
+Add ```CUDA_VISIBLE_DEVICES={GPU_ID} ``` before the command to run the experiment on the specific GPUs. If you set ```GPU_ID``` as ```-1```, the experiment runs on cpus.
 
 ### Running the main experiment of the paper in Section 4.2 and 4.3 at ONCE
 
 1. Go to directory of respective dataset in `data/` for instructions on generating the benchmark dataset
-2. Configure your python file
-3. Run (IMPORTANT NOTE: before you run the experiment, please refer to the python file that runs all the experiments in `paper_experiments`. You need to assign which GPU you will assign at each experiment, and you may need to run experiments partially as running all the experiments may exceed the VRAM of your GPU; check the available RAM if you are running the experiments on CPU.)
+2. Configure your python file (IMPORTANT NOTE: before you run the experiment, please refer to the python file that runs all the experiments in `paper_experiments`. You need to assign which GPU you will assign at each experiment, and you may need to run experiments partially as running all the experiments may exceed the VRAM of your GPU; check the available RAM if you are running the experiments on CPU.)
+3. Run
 ```
 $ cd models/
 
 # Run baseline experiments
-$ python ../paper_experiments/experiment_run_har_baselines.py
-$ python ../paper_experiments/experiment_run_celeba_baselines.py
+$ python ../paper_experiments/experiment_run_{dataset_name}_baselines.py
 
 # Run fedbalancer experiments
-$ python ../paper_experiments/experiment_run_har_fedbalancer.py
-$ python ../paper_experiments/experiment_run_celeba_fedbalancer.py
+$ python ../paper_experiments/experiment_run_{dataset_name}_fedbalancer.py
 
 # TO RUN WITH CPU: Run baseline experiments
-$ python ../paper_experiments/experiment_run_har_baselines_cpu.py
-$ python ../paper_experiments/experiment_run_celeba_baselines_cpu.py
+$ python ../paper_experiments/experiment_run_{dataset_name}_baselines_cpu.py
 
 # TO RUN WITH CPU: Run fedbalancer experiments
-$ python ../paper_experiments/experiment_run_har_fedbalancer_cpu.py
-$ python ../paper_experiments/experiment_run_celeba_fedbalancer_cpu.py
+$ python ../paper_experiments/experiment_run_{dataset_name}_fedbalancer_cpu.py
 ```
 
 <h3 id="config">Config File</h3>
