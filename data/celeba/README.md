@@ -20,7 +20,7 @@ Our task is to determine whether the celebrity in the image is smiling. This can
     - ```--spltseed``` :=  seed to be used before random split of data
 
 Please run the following to generate the same dataset as ours in the FedBalancer paper experiments.
-- ```./preprocess.sh -s niid --sf 0.1 -k 5 -t user``` (full-sized dataset)
+- ```./preprocess.sh -s niid --sf 0.1 -k 5 -t user --smplseed 1622358203 --spltseed 1622358204``` (full-sized dataset)
 
 Make sure to delete the rem_user_data, sampled_data, test, and train subfolders in the data directory before re-running preprocess.sh
 
