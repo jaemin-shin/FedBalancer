@@ -3,11 +3,13 @@
 - A systematic federated learning with sample selection to optimize the time-to-accuracy performance
 - Includes an adaptive deadline control scheme that predicts the optimal deadline for each round with varying client data
 
-This repository contains the code and experiments for the paper:
+This repository contains the code of the simulation experiments (Section 4.1~4.5) of the paper:
 
->  Conditionally accepted to [MobiSys'22](https://www.sigmobile.org/mobisys/2022/)
+>  [MobiSys'22](https://www.sigmobile.org/mobisys/2022/)
 >
 > [FedBalancer: Data and Pace Control for Efficient Federated Learning on Heterogeneous Clients](https://arxiv.org/abs/2201.01601)
+
+For the testbed experiment on Android devices in our paper (Section 4.6), please refer to the following repository: [flower-FedBalancer-testbed](https://github.com/jaemin-shin/flower-FedBalancer-testbed).
 
 ## System Requirements
 
@@ -15,7 +17,7 @@ The system is written and evaluated based on  ```Python 3.6.9```, with ```tensor
 
 As an alternative setup, you can use general Ubuntu servers with NVIDIA GPUs.
 
-Note that you could also run our system and experiemtns on CPUs, which could be a bit slower. How to run the experiments on CPUs are instructed below.
+Note that you could also run our system and experiments on CPUs, which could be slower.
 
 The experimental results on different setup and different GPUs may differ, but the results will derive same conclusions that we stated in our paper.
 
@@ -100,13 +102,9 @@ $ cd FedBalancer
 $ pip install -r requirements.txt
 ```
 
-## Important Note
+## Datasets
 
 We evaluated based on five datasets: ```FEMNIST```, ```Celeba```, ```Reddit```, ```Shakespeare```, ```UCI-HAR```.
-
-Currently, this repository only supports experiments with ```Celeba``` and ```UCI-HAR```.
-
-Handling other datasets will be added soon.
 
 ## How to Run the Experiments
 
@@ -118,13 +116,13 @@ Handling other datasets will be added soon.
 $ cd models/
 
 # FedAvg + 1T experiment in Section 4.2 and 4.3 with random seed 0
-# candidate {dataset_name}: celeba/har
+# candidate {dataset_name}: femnist/celeba/reddit/shakespeare/har
 
 $ python main.py --config=configs/{dataset_name}/{dataset_name}_fedavg_1T_seed0.cfg
 # example: python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
 
 # FedBalancer experiment in Section 4.2 and 4.3 with random seed 0
-# candidate {dataset_name}: celeba/har
+# candidate {dataset_name}: femnist/celeba/reddit/shakespeare/har
 
 $ python main.py --config=configs/{dataset_name}/{dataset_name}_fedbalancer_seed0.cfg
 # example: python main.py --config=configs/har/har_fedbalancer_seed0.cfg
@@ -132,7 +130,9 @@ $ python main.py --config=configs/{dataset_name}/{dataset_name}_fedbalancer_seed
 
 Add ```CUDA_VISIBLE_DEVICES={GPU_ID} ``` before the command to run the experiment on the specific GPUs. If you set ```GPU_ID``` as ```-1```, the experiment runs on cpus.
 
-### Running the main experiment of the paper in Section 4.2 and 4.3 at ONCE
+Note that you could change the parameters of fedbalancer config file to test another parameters. 
+
+### Running the experiments at ONCE
 
 1. Go to directory of respective dataset in `data/` for instructions on generating the benchmark dataset
 2. Configure your python file (IMPORTANT NOTE: before you run the experiment, please refer to the python file that runs all the experiments in `paper_experiments`. You need to assign which GPU you will assign at each experiment, and you may need to run experiments partially as running all the experiments may exceed the VRAM of your GPU; check the available RAM if you are running the experiments on CPU.)
@@ -209,6 +209,9 @@ realoort True # whether to apply oort or not
 # fedprox True # whether to apply fedprox and params needed, please refer to the sysml'20 (https://arxiv.org/pdf/1812.06127.pdf) for more details
 # fedprox_mu 0.5
 
+## sample selection baseline parameters
+# ss_baseline True
+
 ## Other paraemeters
 global_final_time 500000 # the experiment terminates if the time in the experiment exceeds the global_final_time
 # global_final_test_accuracy 0.9 # the experiment terminates if the test accuracy exceeds the global_final_test_accuracy
@@ -232,23 +235,7 @@ noise_factor 0.5 # noise factor for differential privacy of FedBalancer
 
 ## How to Parse the Results After the Experiment
 - Please refer to the jupyter notebook ipynb scripts in ```results_parsing```
-- Current repository only contains jupyter notebook for ```Celeba``` and ```UCI-HAR``` dataset. Other datasets will be added shortly.
-### Celeba Results
-- FedAvg+1T: 0.97 ± 0.04 Speedup, 0.847 ± 0.010 Accuracy
-- FedAvg+2T: 0.63 ± 0.07 Speedup, 0.825 ± 0.014 Accuracy
-- FedAvg+SPC: 0.76 ± 0.17 Speedup, 0.834 ± 0.017 Accuracy
-- FedAvg+WFA: 0.55 ± 0.07 Speedup, 0.816 ± 0.016 Accuracy
-- Prox+1T: 1.12 ± 0.05 Speedup, 0.854 ± 0.013 Accuracy
-- Prox+2T: 0.69 ± 0.06 Speedup, 0.832 ± 0.016 Accuracy
-- FedBalancer: 1.53 ± 0.16 Speedup, 0.849 ± 0.005 Accuracy
-### UCI-HAR Results
-- FedAvg+1T: 0.61 ± 0.34 Speedup, 0.876 ± 0.011 Accuracy
-- FedAvg+2T: 0.83 ± 0.24 Speedup, 0.894 ± 0.002 Accuracy
-- FedAvg+SPC: 0.69 ± 0.12 Speedup, 0.880 ± 0.005 Accuracy
-- FedAvg+WFA: 0.83 ± 0.24 Speedup, 0.894 ± 0.002 Accuracy
-- Prox+1T: 0.93 ± 0.15 Speedup, 0.905 ± 0.008 Accuracy
-- Prox+2T: 0.83 ± 0.24 Speedup, 0.894 ± 0.002 Accuracy
-- FedBalancer: 1.37 ± 0.06 Speedup, 0.914 ± 0.005 Accuracy
+- Current repository contains jupyter notebook for ```UCI-HAR``` dataset as an example.
 
 ## Notes
 
