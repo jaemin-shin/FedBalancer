@@ -1,7 +1,9 @@
 # Shakespeare Dataset
 
 ## Setup Instructions
-- Run ```chmod +755 preprocess.sh```, ```chmod +755 stat.sh```, ```chmod +755 preprocess/data_to_json.sh```, and ```chmod +755 preprocess/get_data.sh``` to run the preprocessing script
+- Download the ```data.tar.gz``` from this [Google Drive link](https://drive.google.com/file/d/1o-y2Wq5SfXIYWri5jgy9hKJHYU7O4YxW/view?usp=sharing)
+- Place the ```data.tar.gz``` file in this directory and run ```tar -xzvf data.tar.gz```
+- Run ```chmod +755 preprocess.sh```, ```chmod +755 stat.sh```
 - Run preprocess.sh with a choice of the following tags:
   - ```-s``` := 'iid' to sample in an i.i.d. manner, or 'niid' to sample in a non-i.i.d. manner; more information on i.i.d. versus non-i.i.d. is included in the 'Notes' section
   - ```--iu``` := number of users, if i.i.d. sampling; expressed as a fraction of the total number of users; default is 0.01
@@ -14,7 +16,7 @@
   - ```--spltseed``` :=  seed to be used before random split of data
 
 Please run the following to generate the same dataset as ours in the FedBalancer paper experiments.
-- ```./preprocess.sh -s niid --sf 0.2 -k 0 -t user```
+- ```./preprocess.sh -s niid --sf 0.2 -k 0 -t user --smplseed 1627886276 --spltseed 1627886285```
 
 Make sure to delete the rem_user_data, sampled_data, test, and train subfolders in the data directory before re-running preprocess.sh
 
