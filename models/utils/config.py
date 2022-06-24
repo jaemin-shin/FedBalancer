@@ -78,6 +78,8 @@ class Config():
         self.global_final_test_accuracy = 0.0
 
         self.output_path = ''
+
+        self.ss_baseline = False
         
         logger.info('read config from {}'.format(config_file))
         self.read_config(config_file)
@@ -202,6 +204,8 @@ class Config():
                         self.noise_factor = float(line[1].strip())
                     elif line[0] == 'output_path':
                         self.output_path = str(line[1])
+                    elif line[0] == 'ss_baseline':
+                        self.ss_baseline = line[1].strip()=='True'
                 except Exception as e:
                     traceback.print_exc()
         if self.real_world and 'realworld' not in self.dataset:

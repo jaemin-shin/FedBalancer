@@ -2,7 +2,7 @@
 
 MODEL_PARAMS = {
     'femnist.cnn': (0.001, 62), # lr, num_classes
-    'har.lr': (0.0003, 6), # lr, num_classes
+    'har.cnn': (0.005, 6), # lr, num_classes
     'shakespeare.stacked_lstm': (0.8, 80, 80, 256), # lr, seq_len, num_classes, num_hidden
     'celeba.cnn': (0.001, 2), # lr, num_classes
     'big_reddit.topk_stacked_lstm': (2, 10, 256, 2), # lr, seq_len, num_hidden, num_layers

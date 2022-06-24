@@ -1,0 +1,2 @@
+model_checkpoint_path: "femnist_fedprox_mu_0_0_1T_seed1.ckpt"
+all_model_checkpoint_paths: "femnist_fedprox_mu_0_0_1T_seed1.ckpt"

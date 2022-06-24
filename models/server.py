@@ -183,9 +183,9 @@ class Server:
                         summ *= math.pow(self.deadline / self.client_last_selected_round_duration[c_id], self.system_utility_penalty_alpha)
                 else:
                     if self.cfg.fb_inference_pipelining:
-                        client_complete_time = (c_id_to_client_object[c_id].device.get_expected_download_time()) + (c_id_to_client_object[c_id].device.get_expected_upload_time(c.model.size)) +  ((np.mean(c_id_to_client_object[c_id].trained_num_of_samples[-5:])-1)//self.cfg.batch_size + 1) * np.mean(c_id_to_client_object[c_id].per_batch_train_times) * self.cfg.num_epochs
+                        client_complete_time = (c_id_to_client_object[c_id].device.get_expected_download_time()) + (c_id_to_client_object[c_id].device.get_expected_upload_time()) +  ((np.mean(c_id_to_client_object[c_id].trained_num_of_samples[-5:])-1)//self.cfg.batch_size + 1) * np.mean(c_id_to_client_object[c_id].per_batch_train_times) * self.cfg.num_epochs
                     else:
-                        client_complete_time = (c_id_to_client_object[c_id].device.get_expected_download_time()) + (c_id_to_client_object[c_id].device.get_expected_upload_time(c.model.size)) + np.mean(c_id_to_client_object[c_id].inference_times_per_sample) * (c_id_to_client_object[c_id].num_train_samples) +  ((np.mean(c_id_to_client_object[c_id].trained_num_of_samples[-5:])-1)//self.cfg.batch_size + 1) * np.mean(c_id_to_client_object[c_id].per_batch_train_times) * self.cfg.num_epochs
+                        client_complete_time = (c_id_to_client_object[c_id].device.get_expected_download_time()) + (c_id_to_client_object[c_id].device.get_expected_upload_time()) + np.mean(c_id_to_client_object[c_id].inference_times_per_sample) * (c_id_to_client_object[c_id].num_train_samples) +  ((np.mean(c_id_to_client_object[c_id].trained_num_of_samples[-5:])-1)//self.cfg.batch_size + 1) * np.mean(c_id_to_client_object[c_id].per_batch_train_times) * self.cfg.num_epochs
                         
                     if client_complete_time > self.oort_non_pacer_deadline:
                         summ *= math.pow(self.oort_non_pacer_deadline / client_complete_time, self.system_utility_penalty_alpha)
@@ -357,9 +357,9 @@ class Server:
 
         for c in selected_clients:
             if self.cfg.fb_inference_pipelining:
-                client_complete_time[str(c.id)] = (c.device.get_expected_download_time()) + (c.device.get_expected_upload_time(c.model.size)) + ((np.mean(c.trained_num_of_samples[-5:])-1)//self.cfg.batch_size + 1) * np.mean(c.per_batch_train_times) * num_epochs + self.guard_time
+                client_complete_time[str(c.id)] = (c.device.get_expected_download_time()) + (c.device.get_expected_upload_time()) + ((np.mean(c.trained_num_of_samples[-5:])-1)//self.cfg.batch_size + 1) * np.mean(c.per_batch_train_times) * num_epochs + self.guard_time
             else:
-                client_complete_time[str(c.id)] = (c.device.get_expected_download_time()) + (c.device.get_expected_upload_time(c.model.size)) + np.mean(c.inference_times_per_sample) * (c.num_train_samples) +  ((np.mean(c.trained_num_of_samples[-5:])-1)//self.cfg.batch_size + 1) * np.mean(c.per_batch_train_times) * num_epochs + self.guard_time
+                client_complete_time[str(c.id)] = (c.device.get_expected_download_time()) + (c.device.get_expected_upload_time()) + np.mean(c.inference_times_per_sample) * (c.num_train_samples) +  ((np.mean(c.trained_num_of_samples[-5:])-1)//self.cfg.batch_size + 1) * np.mean(c.per_batch_train_times) * num_epochs + self.guard_time
         
         for i in range(1, t_max):
             complete_user_count = 0
@@ -1109,9 +1109,3 @@ class Server:
         while tw < 0:
             tw =  np.random.normal(self.cfg.time_window[0], self.cfg.time_window[1])
         return tw
-    
-    def save_clients_info(self):
-        config_name_split = self.cfg.config_name.split('/')
-        with open(self.cfg.output_path+'/clients_info/'+config_name_split[-1][:-4]+'_clients_info.json', 'w') as f:
-            json.dump(self.clients_info, f)
-        logger.info('save clients_info.json.')

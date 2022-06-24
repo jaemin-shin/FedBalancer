@@ -33,7 +33,7 @@ class Model(ABC):
             self.saver = tf.train.Saver()
         config = tf.ConfigProto(log_device_placement=False)
         config.gpu_options.allow_growth=True
-        # config.gpu_options.per_process_gpu_memory_fraction = gpu_fraction
+        
         self.sess = tf.Session(graph=self.graph, config=config)
 
         self.size = graph_size(self.graph)  

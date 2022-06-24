@@ -174,8 +174,8 @@ class Device_Util:
         celeba_std = [982.5, 54.6, 20.3]
         femnist_mean = [1642, 588, 179]          
         femnist_std = [99.5, 23.9, 2.3]
-        har_mean = [1642, 588, 179]          
-        har_std = [99.5, 23.9, 2.3]
+        har_mean = [(25305880 / 26414840) * elem for elem in femnist_mean]          
+        har_std = [(25305880 / 26414840) * elem for elem in femnist_std]
         shakespeare_mean = [28621, 13579, 10681]    # batch size = 100
         shakespeare_std = [1720.7, 104.6, 125.6]    # batch size = 100
 
@@ -186,7 +186,7 @@ class Device_Util:
             train_time_per_batch = np.random.normal(reddit_mean[ii], reddit_std[ii]) / 1000
         elif self.model == 'cnn' and self.dataset == 'femnist':
             train_time_per_batch = np.random.normal(femnist_mean[ii], femnist_std[ii]) / 1000
-        elif self.model == 'lr' and self.dataset == 'har':
+        elif self.model == 'cnn' and self.dataset == 'har':
             train_time_per_batch = np.random.normal(har_mean[ii], har_std[ii]) / 1000
         elif 'stacked_lstm' in self.model and self.dataset == 'shakespeare':
             train_time_per_batch = np.random.normal(shakespeare_mean[ii], shakespeare_std[ii]) / 1000
@@ -209,8 +209,8 @@ class Device_Util:
         celeba_std = [982.5, 54.6, 20.3]
         femnist_mean = [1642, 588, 179]          
         femnist_std = [99.5, 23.9, 2.3]
-        har_mean = [1642, 588, 179]          
-        har_std = [99.5, 23.9, 2.3]
+        har_mean = [(25305880 / 26414840) * elem for elem in femnist_mean]          
+        har_std = [(25305880 / 26414840) * elem for elem in femnist_std]
         shakespeare_mean = [28621, 13579, 10681]    # batch size = 100
         shakespeare_std = [1720.7, 104.6, 125.6]    # batch size = 100
 
@@ -221,7 +221,7 @@ class Device_Util:
             train_time_per_batch = np.random.normal(reddit_mean[ii], reddit_std[ii]) / 1000
         elif self.model == 'cnn' and self.dataset == 'femnist':
             train_time_per_batch = np.random.normal(femnist_mean[ii], femnist_std[ii]) / 1000
-        elif self.model == 'lr' and self.dataset == 'har':
+        elif self.model == 'cnn' and self.dataset == 'har':
             train_time_per_batch = np.random.normal(har_mean[ii], har_std[ii]) / 1000
         elif 'stacked_lstm' in self.model and self.dataset == 'shakespeare':
             train_time_per_batch = np.random.normal(shakespeare_mean[ii], shakespeare_std[ii]) / 1000
@@ -246,8 +246,8 @@ class Device_Util:
         celeba_std = [982.5, 54.6, 20.3]
         femnist_mean = [1642, 588, 179]          
         femnist_std = [99.5, 23.9, 2.3]
-        har_mean = [1642, 588, 179]          
-        har_std = [99.5, 23.9, 2.3]
+        har_mean = [(25305880 / 26414840) * elem for elem in femnist_mean]          
+        har_std = [(25305880 / 26414840) * elem for elem in femnist_std]
         shakespeare_mean = [28621, 13579, 10681]    # batch size = 100
         shakespeare_std = [1720.7, 104.6, 125.6]    # batch size = 100
 
@@ -258,7 +258,7 @@ class Device_Util:
             train_time_per_batch = np.random.normal(reddit_mean[ii], reddit_std[ii]) / 1000
         elif self.model == 'cnn' and self.dataset == 'femnist':
             train_time_per_batch = np.random.normal(femnist_mean[ii], femnist_std[ii]) / 1000
-        elif self.model == 'lr' and self.dataset == 'har':
+        elif self.model == 'cnn' and self.dataset == 'har':
             train_time_per_batch = np.random.normal(har_mean[ii], har_std[ii]) / 1000
         elif 'stacked_lstm' in self.model and self.dataset == 'shakespeare':
             train_time_per_batch = np.random.normal(shakespeare_mean[ii], shakespeare_std[ii]) / 1000

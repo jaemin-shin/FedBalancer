@@ -85,6 +85,18 @@ def main():
     logger.info('======================Setup Clients==========================')
     train_clients, test_clients = setup_clients(cfg, client_model)
 
+    if cfg.ss_baseline:
+        client_sample_counts = []
+        for c in train_clients:
+            client_sample_counts.append(len(c.train_data["x"]))
+        client_sample_counts = np.array(client_sample_counts)
+
+        for c in train_clients:
+            if len(c.train_data["x"]) >= np.percentile(client_sample_counts, 80):
+                c.is_big_client = True
+                c.select_sample_num = int(np.percentile(client_sample_counts, 80))
+        
+
     # Calculate the initial deadline based on the mean of sampled round_duration
     # This deadline is fixed to be used for FedAvg or FedProx + 1T / 2T baselines
     # Include inference time when calculating the round duration time for FedBalancer and OortBalancer, as clients do full pass on their data when they are first selected
@@ -95,9 +107,11 @@ def main():
         round_duration_summ_list = []
         for c in train_clients:
             if cfg.realoortbalancer or cfg.fedbalancer:
-                round_duration_summ_list.append(c.device.get_expected_download_time() + c.device.get_expected_upload_time(client_model.size) + np.mean(c.inference_times) + np.mean(c.per_epoch_train_times)*cfg.num_epochs)
+                round_duration_summ_list.append(c.device.get_expected_download_time() + c.device.get_expected_upload_time() + np.mean(c.inference_times) + np.mean(c.per_epoch_train_times)*cfg.num_epochs)
+            elif cfg.ss_baseline and c.is_big_client:
+                round_duration_summ_list.append(c.device.get_expected_download_time() + c.device.get_expected_upload_time() + ((c.select_sample_num-1)//cfg.batch_size + 1) * np.mean(c.per_batch_train_times)*cfg.num_epochs)
             else:
-                round_duration_summ_list.append(c.device.get_expected_download_time() + c.device.get_expected_upload_time(client_model.size) + np.mean(c.per_epoch_train_times)*cfg.num_epochs)
+                round_duration_summ_list.append(c.device.get_expected_download_time() + c.device.get_expected_upload_time() + np.mean(c.per_epoch_train_times)*cfg.num_epochs)
             if c.num_train_samples <= 0:
                 assert(False)
         if cfg.ddl_baseline_fixed:
@@ -217,9 +231,6 @@ def main():
             if (i + 1) % (10*eval_every) == 0 or (i + 1) == num_rounds:
                 test_num = len(test_clients)
                 config_name_split = config_name.split('/')
-                with open(cfg.output_path+'/attended_clients/'+config_name_split[-1][:-4]+'_attended_clients.json', 'w') as fp:
-                    json.dump(list(attended_clients), fp)
-                    logger.info('save attended_clients.json')
                 
                 # Save server model
                 ckpt_path = os.path.join('../models/checkpoints', cfg.dataset)
@@ -234,17 +245,11 @@ def main():
 
             test_stat_metrics = server.test_model(test_clients, set_to_use='test')
             current_test_accuracy = print_metrics(test_stat_metrics, sc_num_samples, prefix='test_')
-            
-            if (i + 1) % (10*eval_every) == 0 or (i + 1) == num_rounds:
-                server.save_clients_info()
     
     logger.info('--------------------- FINAL test result ---------------------')
     test_num = len(test_clients)
     test_num = len(test_clients)
     config_name_split = config_name.split('/')
-    with open(cfg.output_path+'/attended_clients/'+config_name_split[-1][:-4]+'_attended_clients.json', 'w') as fp:
-        json.dump(list(attended_clients), fp)
-        logger.info('save attended_clients.json')
     
     # Save server model
     ckpt_path = os.path.join('../models/checkpoints', cfg.dataset)
@@ -259,9 +264,6 @@ def main():
 
     test_stat_metrics = server.test_model(test_clients, set_to_use='test')
     current_test_accuracy = print_metrics(test_stat_metrics, sc_num_samples, prefix='test_')
-    
-    if (i + 1) % (10*eval_every) == 0 or (i + 1) == num_rounds:
-        server.save_clients_info()
             
     # Close models
     server.close_model()

@@ -94,6 +94,10 @@ class Client:
         if not self.device: 
             self.device = Device(cfg, 0.0)
         
+        if self.cfg.ss_baseline:
+            self.is_big_client = False
+            self.select_sample_num = 0
+        
         # Sample round completion time of a client, to calculate the initial deadline in main.py
         # Here, train time and inference time is calculated
         if self.cfg.hard_hete:
@@ -172,14 +176,14 @@ class Client:
         
         def train_with_simulate_time(self, start_t, num_epochs=1, batch_size=10, minibatch=None):
 
-            if (self.cfg.fedbalancer or self.cfg.fb_client_selection or self.cfg.realoortbalancer):
+            if (self.cfg.fedbalancer or self.cfg.fb_client_selection or self.cfg.realoortbalancer or (self.cfg.ss_baseline and self.is_big_client)):
                 whole_xs, whole_ys = zip(*list(zip(self.train_data["x"], self.train_data["y"])))
                 whole_data = {'x': whole_xs, 'y': whole_ys}
 
                 # if cfg.fb_inference_pipelining is True, it means that FedBalancer is not doing a full pass on the client's data 
                 # except when a client is first selected for a round...
                 # otherwise, FedBalancer do full pass on the client's data at the start of training at a round
-                if self.cfg.fb_inference_pipelining:
+                if self.cfg.fb_inference_pipelining or (self.cfg.ss_baseline and self.is_big_client):
                     if self.is_first_round:
                         whole_data_loss_list_saved = self.model.test(whole_data)['loss_list']
                         whole_data_loss_list = whole_data_loss_list_saved
@@ -287,6 +291,18 @@ class Client:
                 elif self.cfg.fb_client_selection:
                     sorted_loss = list(sorted(whole_data_loss_list, reverse=False))
                     self.sorted_loss = sorted_loss
+                elif (self.cfg.ss_baseline and self.is_big_client):
+                    data_len = self.select_sample_num
+                    tmp_data = zip(self.train_data["x"], self.train_data["y"])
+                    tmp_data = zip(tmp_data, range(len(self.train_data["x"])))
+                    tmp_data = zip(whole_data_loss_list, tmp_data)
+                    tmp_data = sorted(tmp_data, reverse=True, key=lambda elem: elem[0])
+
+                    tmp_data_pkg = [x for _,x in tmp_data[:data_len]]
+                    tmp_data = [x for x,_ in tmp_data_pkg]
+                    tmp_data_idx = [x for _,x in tmp_data_pkg]
+
+                    num_data = self.select_sample_num
             else:
                 frac = min(1.0, minibatch)
                 num_data = max(1, int(frac*len(self.train_data["x"])))
@@ -301,6 +317,10 @@ class Client:
                 num_data = min(len(self.train_data["x"]), self.cfg.max_sample)
                 if self.cfg.fedbalancer:
                     num_data = fedbalancer_data_len
+                    xs, ys = zip(*tmp_data)
+                    data_idx = tmp_data_idx
+                elif (self.cfg.ss_baseline and self.is_big_client):
+                    num_data = self.select_sample_num
                     xs, ys = zip(*tmp_data)
                     data_idx = tmp_data_idx
                 # Oort randomly selects a batch per epoch for training at this round
@@ -462,6 +482,13 @@ class Client:
                 else:
                     inference_time, _ = self.device.get_train_time_and_train_time_per_batch(user_whole_data_len, batch_size, 1)
                     inference_time = inference_time * 0.5
+            elif (self.cfg.ss_baseline and self.is_big_client):
+                #inference_time, _ = self.device.get_train_time_and_train_time_per_batch(user_whole_data_len - fedbalancer_data_len, batch_size, 1)
+                if not self.is_first_round:
+                    inference_time = 0
+                else:
+                    inference_time, _ = self.device.get_train_time_and_train_time_per_batch(user_whole_data_len, batch_size, 1)
+                    inference_time = inference_time * 0.5
             elif self.cfg.realoortbalancer:
                 if self.cfg.fb_inference_pipelining and not self.is_first_round:
                     inference_time = 0
@@ -478,7 +505,7 @@ class Client:
             self.act_inference_time = 0
             self.ori_inference_time = 0
 
-            if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+            if self.cfg.fedbalancer or self.cfg.realoortbalancer or (self.cfg.ss_baseline and self.is_big_client):
                 down_end_time = self.timer.get_future_time(start_t, download_time)
                 logger.debug("client {} download-time-need={}, download-time-cost={} end at {}, "
                             .format(self.id, download_time, down_end_time-start_t, down_end_time))
@@ -537,7 +564,7 @@ class Client:
             # If self.cfg.oort_pacer or self.cfg.ddl_baseline_smartpc, clients perform training till the end -- clients that will not be accepted are handled on server.py in this case
             # Otherwise, if training exceeds the deadline, the client round fails and raises timeouterror
             if not (self.cfg.oort_pacer or self.cfg.ddl_baseline_smartpc):
-                if not (self.cfg.fedbalancer or self.cfg.realoortbalancer):
+                if not (self.cfg.fedbalancer or self.cfg.realoortbalancer or (self.cfg.ss_baseline and self.is_big_client)):
                     if (down_end_time-start_t) > self.deadline:
                         # download too long
                         self.actual_comp = 0.0
@@ -695,7 +722,7 @@ class Client:
                                 else:
                                     comp, update, acc, loss, grad, loss_old, data_loss_list_and_idx = self.model.train(data, data_idx, num_epochs, batch_size)
                                 logger.debug("client {} train-epochs={}".format(self.id, num_epochs))
-                else: # fedbalancer or realoortbalancer
+                else: # fedbalancer or realoortbalancer or (self.cfg.ss_baseline and self.is_big_client)
                     if (down_end_time-start_t) > self.deadline:
                         # download too long
                         self.actual_comp = 0.0
@@ -891,7 +918,7 @@ class Client:
             
             # If fb_inference_pipelining == True, update the self.whole_data_loss_list of a client by the loss that is naturally acquired from the training process
             # only the selected samples' loss is updated in this case
-            if self.cfg.fb_inference_pipelining and len(data_loss_list_and_idx) > 0:
+            if (self.cfg.fb_inference_pipelining or (self.cfg.ss_baseline and self.is_big_client)) and len(data_loss_list_and_idx) > 0:
                 data_loss_list = [x for x,_ in data_loss_list_and_idx]
                 data_loss_list_idx = [x for _,x in data_loss_list_and_idx]
 

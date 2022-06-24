@@ -6,10 +6,10 @@ config_lines = [
 'no_training False',
 'realworld False',
 'dataset har',
-'model lr',
-'num_rounds 6000',
+'model cnn',
+'num_rounds 2000',
 'max_client_num -1',
-'learning_rate 0.0003',
+'learning_rate 0.005',
 'eval_every 5',
 'clients_per_round 5',
 'min_selected 1',
@@ -19,7 +19,7 @@ config_lines = [
 'aggregate_algorithm SucFedAvg',
 'num_epochs 5',
 'output_path ../models/configs/har/',
-'global_final_time 500000']
+'global_final_time 200000']
 
 
 baseline_lines = [
@@ -29,6 +29,7 @@ baseline_lines = [
 (['fedavg_WFA'], ['ddl_baseline_smartpc True', 'ddl_baseline_smartpc_percentage 1.0']),
 (['fedprox_mu_0_0_1T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 1.0', 'fedprox True', 'fedprox_mu 0.0']),
 (['fedprox_mu_0_0_2T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 2.0', 'fedprox True', 'fedprox_mu 0.0']),
+(['sampleselection_baseline'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 1.0', 'fedprox True', 'fedprox_mu 0.0', 'ss_baseline True'])
 ]
 
 process_count = 0
@@ -36,23 +37,21 @@ gpu_id = {}
 gpu_id[0] = 0
 gpu_id[1] = 0
 gpu_id[2] = 0
-gpu_id[3] = 0
-gpu_id[4] = 0
-gpu_id[5] = 0
-gpu_id[6] = 0
-gpu_id[7] = 0
-gpu_id[8] = 0
-gpu_id[9] = 1
-gpu_id[10] = 1
-gpu_id[11] = 1
-gpu_id[12] = 1
-gpu_id[13] = 1
-gpu_id[14] = 1
-gpu_id[15] = 1
-gpu_id[16] = 1
-gpu_id[17] = 1
-
-process_count = 0
+gpu_id[3] = 1
+gpu_id[4] = 1
+gpu_id[5] = 1
+gpu_id[6] = 2
+gpu_id[7] = 2
+gpu_id[8] = 2
+gpu_id[9] = 3
+gpu_id[10] = 3
+gpu_id[11] = 3
+gpu_id[12] = 4
+gpu_id[13] = 4
+gpu_id[14] = 4
+gpu_id[15] = 5
+gpu_id[16] = 5
+gpu_id[17] = 5
 
 for seed in range(3):
     for exp in baseline_lines:

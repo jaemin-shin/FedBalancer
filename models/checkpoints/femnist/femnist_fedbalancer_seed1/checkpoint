@@ -1,0 +1,2 @@
+model_checkpoint_path: "femnist_fedbalancer_seed1.ckpt"
+all_model_checkpoint_paths: "femnist_fedbalancer_seed1.ckpt"

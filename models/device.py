@@ -102,14 +102,14 @@ class Device():
         download_time = self.model_size / download_speed
         return float(download_time)
     
-    def get_expected_upload_time(self, model_size):
+    def get_expected_upload_time(self):
         if self.model_size == 0.0 :
             return 0.0
 
         upload_speed = self.upload_speed_u
         while upload_speed < 0:
             upload_speed = self.upload_speed_u
-        upload_time = model_size / upload_speed / 1000
+        upload_time = self.model_size / upload_speed
         return float(upload_time)
     
     def get_train_time_and_train_time_per_batch(self, num_sample, batch_size, num_epoch):

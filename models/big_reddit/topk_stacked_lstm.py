@@ -355,7 +355,7 @@ class ClientModel(Model):
         # zp_count = 0
         sample_len = len(data['x'])
 
-        if self.cfg.fedbalancer:
+        if self.cfg.fedbalancer or (self.cfg.ss_baseline):
             for input_data, target_data, input_lengths, input_mask in self.batch_data_for_test(data, batch_size):
                 # zp_count += self.zeropadding_count(input_data)
                 with self.graph.as_default():
@@ -380,7 +380,7 @@ class ClientModel(Model):
                 tot_batches += 1
                 sample_loss.extend(loss_list)
         else:
-            for input_data, target_data, input_lengths, input_mask in self.batch_data(data, batch_size):
+            for input_data, target_data, input_lengths, input_mask in self.batch_data_for_test(data, batch_size):
                 # zp_count += self.zeropadding_count(input_data)
                 with self.graph.as_default():
                     acc, targets, top_5_indices, loss, loss_list = self.sess.run(

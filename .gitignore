@@ -7,6 +7,7 @@
 *.index
 *.data-00000-of-00001
 *ipynb_checkpoints*
+*.tar.gz
 
 models/__pycache__/
 models/*/__pycache__/
@@ -20,5 +21,5 @@ _templates/
 data/har/data/*
 data/celeba/data/*
 data/femnist/data/*
-data/reddit/data/*
+data/big_reddit/data/*
 data/shakespeare/data/*

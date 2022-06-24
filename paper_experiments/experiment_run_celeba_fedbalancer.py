@@ -15,7 +15,6 @@ config_lines = [
 'min_selected 1',
 'max_sample 2147483647',
 'batch_size 10',
-'round_ddl 60 0',
 'update_frac 0.01',
 'aggregate_algorithm SucFedAvg',
 'num_epochs 5',
@@ -37,8 +36,6 @@ gpu_id = {}
 gpu_id[0] = 6
 gpu_id[1] = 6
 gpu_id[2] = 6
-
-process_count = 0
 
 for seed in range(3):
     for exp in fedbalancer_lines:

@@ -6,10 +6,10 @@ config_lines = [
 'no_training False',
 'realworld False',
 'dataset har',
-'model lr',
-'num_rounds 6000',
+'model cnn',
+'num_rounds 2000',
 'max_client_num -1',
-'learning_rate 0.0003',
+'learning_rate 0.005',
 'eval_every 5',
 'clients_per_round 5',
 'min_selected 1',
@@ -24,7 +24,7 @@ config_lines = [
 'fb_simple_control_ddl True',
 'fb_inference_pipelining True',
 'fb_client_selection True',
-'global_final_time 500000']
+'global_final_time 200000']
 
 
 fedbalancer_lines = [
@@ -33,11 +33,10 @@ fedbalancer_lines = [
 
 process_count = 0
 gpu_id = {}
-gpu_id[0] = 0
-gpu_id[1] = 0
-gpu_id[2] = 0
+gpu_id[0] = 6
+gpu_id[1] = 6
+gpu_id[2] = 6
 
-process_count = 0
 
 for seed in range(3):
     for exp in fedbalancer_lines:

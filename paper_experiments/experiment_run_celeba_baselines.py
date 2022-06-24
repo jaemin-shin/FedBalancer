@@ -29,6 +29,7 @@ baseline_lines = [
 (['fedavg_WFA'], ['ddl_baseline_smartpc True', 'ddl_baseline_smartpc_percentage 1.0']),
 (['fedprox_mu_0_1_1T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 1.0', 'fedprox True', 'fedprox_mu 0.1']),
 (['fedprox_mu_0_1_2T'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 2.0', 'fedprox True', 'fedprox_mu 0.1']),
+(['sampleselection_baseline'], ['ddl_baseline_fixed True', 'ddl_baseline_fixed_value_multiplied_at_mean 1.0', 'fedprox True', 'fedprox_mu 0.1', 'ss_baseline True'])
 ]
 
 process_count = 0
@@ -52,7 +53,6 @@ gpu_id[15] = 5
 gpu_id[16] = 5
 gpu_id[17] = 5
 
-process_count = 0
 
 for seed in range(3):
     for exp in baseline_lines:

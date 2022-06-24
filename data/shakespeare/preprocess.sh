@@ -7,15 +7,14 @@ if [[ $@ = *"--raw"* ]]; then
   RAWTAG="--raw"
 fi
 if [ ! -d "data/all_data" ] || [ ! "$(ls -A data/all_data)" ]; then
-    cd preprocess
-    ./data_to_json.sh $RAWTAG
-    cd ..
+    echo "first download and unzip the data directory"
+    exit 0
 fi
 
 NAME="shakespeare"
 
 cd ../utils
 
-./preprocess.sh --name $NAME $@
+bash ./preprocess.sh --name $NAME $@
 
 cd ../$NAME
