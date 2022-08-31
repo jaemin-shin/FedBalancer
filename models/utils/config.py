@@ -25,7 +25,7 @@ class Config():
         self.num_epochs = 1
 
         self.minibatch = None       # always None for FedAvg
-        self.round_ddl = [1000, 0]
+        self.round_ddl = 1000
         self.update_frac = 0.5
         self.max_client_num = 1000    # total client num, -1 for unlimited
 
@@ -66,8 +66,8 @@ class Config():
         self.oort_blacklist = False
         self.oort_blacklist_rounds = 10
 
-        self.realoort = False
-        self.realoortbalancer = False
+        self.oort = False
+        self.oortbalancer = False
 
         self.ddl_baseline_smartpc = False
         self.ddl_baseline_smartpc_percentage = 0.0
@@ -120,7 +120,7 @@ class Config():
                     elif line[0] == 'model':
                         self.model = str(line[1])
                     elif line[0] == 'round_ddl':
-                        self.round_ddl = [float(line[1]), float(line[2])]
+                        self.round_ddl = float(line[1])
                     elif line[0] == 'update_frac':
                         self.update_frac = float(line[1])
                     elif line[0] == 'aggregate_algorithm':
@@ -164,10 +164,10 @@ class Config():
                         self.fb_w = int(line[1].strip())
                     elif line[0] == 'fb_client_selection':
                         self.fb_client_selection = line[1].strip()=='True'
-                    elif line[0] == 'realoort':
-                        self.realoort = line[1].strip()=='True'
-                    elif line[0] == 'realoortbalancer':
-                        self.realoortbalancer = line[1].strip()=='True'
+                    elif line[0] == 'oort':
+                        self.oort = line[1].strip()=='True'
+                    elif line[0] == 'oortbalancer':
+                        self.oortbalancer = line[1].strip()=='True'
                     elif line[0] == 'oort_pacer':
                         self.oort_pacer = line[1].strip()=='True'
                     elif line[0] == 'oort_pacer_delta':

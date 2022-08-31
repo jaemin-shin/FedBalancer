@@ -5,7 +5,7 @@
 
 This repository contains the code of the simulation experiments (Section 4.1~4.5) of the paper:
 
->  [MobiSys'22](https://www.sigmobile.org/mobisys/2022/)
+> [MobiSys'22](https://www.sigmobile.org/mobisys/2022/)
 >
 > [FedBalancer: Data and Pace Control for Efficient Federated Learning on Heterogeneous Clients](https://arxiv.org/abs/2201.01601)
 
@@ -13,7 +13,7 @@ For the testbed experiment on Android devices in our paper (Section 4.6), please
 
 ## System Requirements
 
-The system is written and evaluated based on  ```Python 3.6.9```, with ```tensorflow 1.15.4```, running on ```Ubuntu 18.04``` server with eight ```NVIDIA TITAN Xp``` GPUs.
+The system is written and evaluated based on  ```Python 3.9.12```, with ```PyTorch 1.10.1+cu111```, running on ```Ubuntu 20.04``` server with eight ```NVIDIA TITAN RTX``` GPUs.
 
 As an alternative setup, you can use general Ubuntu servers with NVIDIA GPUs.
 
@@ -25,20 +25,6 @@ The experimental results on different setup and different GPUs may differ, but t
 
 Please use ```conda``` to run a self-contained setup:
 
-### Update your NVIDIA driver
-The following is to update your driver. If you already have installed the required drivers, this step could be skipped. Be sure to have NVIDIA drivers up-to-date.
-
-After running the commands below, run "nvidia-smi" to confirm your update and check that it is on the 11.1 (or newer) CUDA runtime.
-
-```
-$ sudo apt-get dist-upgrade
-$ sudo shudown -r now
-$ sudo apt-get install dkms build-essential
-$ sudo add-apt-repository ppa:graphics-drivers/ppa
-$ sudo apt-get install nvidia-driver-455
-$ sudo shutdown -r now
-```
-
 ### Install miniconda on your system
 
 ```
@@ -48,53 +34,21 @@ $ conda update conda
 $ conda update --all
 ```
 
-### Setup a conda env to install NVIDIA's build of TensorFlow 1.15
+### Setup a conda env and install pip inside conda env
 
 ```
-$ conda create --name fb-conda python=3.6
-$ conda activate fb-conda
+$ conda env create -f environment.yml --name fb-torch-conda
+$ conda activate fb-torch-conda
 $ conda install pip
 ```
 
-### Create a local index for the "wheel" and supporting dependencies
-
-```pip``` will be used for the installing required packages, but the NVIDIA package index is not available on PyPI.org. Please run the following command to set up the index (you should be in activated fb-conda env)
-
+### Deactivate and re-activate the conda env to activate pip inside conda env
 ```
-$ pip install --user nvidia-pyindex
-```
-
-Then, add ```export PATH=$PATH:$HOME/.local/bin``` to your .bashrc file to let new index be recognized by the system. Please re-activate your bash by running the following:
-
-```
-$ source ~/.bashrc
-```
-
-If you are running other kind of shell like ```zsh```, the above commands should be changed accordingly.
-
-### Install the NVIDIA TensorFlow Build
-
-Run the following while being in the activated fb-conda env.
-
-```
-$ conda install -c conda-forge openmpi
-```
-
-Add the following to the .bashrc file ```export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/miniconda3/envs/fb-conda/lib/``` and re-activate the bash by running the following:
-
-```
-$ source ~/.bashrc
-```
-
-Then, with the fb-conda env being activated, use the following command to install the ```NVIDIA Tensorflow 1.15``` with ```pip```.
-
-```
-$ pip install --user nvidia-tensorflow[horovod]
+$ while [ ! -z $CONDA_PREFIX ]; do conda deactivate; done
+$ conda activate fb-torch-dona
 ```
 
 ### Install other dependencies
-
-To install other dependencies, please run the following:
 
 ```
 $ git clone https://github.com/jaemin-shin/FedBalancer.git
@@ -190,7 +144,7 @@ aggregate_algorithm SucFedAvg # choose in [SucFedAvg, FedAvg], please refer to m
 # qffl_q 5
 
 ## parameters related to Oort client selection method, please refer to the OSDI'21 (https://www.usenix.org/conference/osdi21/presentation/lai) for more
-realoort True # whether to apply oort or not
+oort True # whether to apply oort or not
 # oort_pacer True # whether to apply oort-pacer or not
 # oort_pacer_delta 10
 # oort_blacklist True # whether to apply oort's client blacklisting or not
@@ -230,7 +184,7 @@ fb_client_selection True # if True, fedbalancer performs client selection based 
 fb_inference_pipelining True # if True, fedbalancer clients only performs full-data inference once, when they are first selected for a round. If False, fedbalancer clients performs full-data inference at every selected round to get up-to-date sample-level loss. We recommend to set this as True.
 noise_factor 0.5 # noise factor for differential privacy of FedBalancer
 
-# realoortbalancer # this option allows us to perform OortBalancer as described in Section 3.4. This should not be used with fedbalancer True option.
+# oortbalancer # this option allows us to perform OortBalancer as described in Section 3.4. This should not be used with fedbalancer True option.
 ```
 
 ## How to Parse the Results After the Experiment

@@ -7,7 +7,6 @@ import traceback
 import sys
 import os
 import numpy as np
-from keras import models
 cur_dir = os.path.dirname(__file__)
 
 class Device_Util:
@@ -130,34 +129,6 @@ class Device_Util:
                 res: True for support and vice versa
         '''
         return real_device in self.real2benchmark and 'unknown' not in self.real2benchmark[real_device]
-    
-    def get_layer_train_time(self, device, layer, batch_size, seq_len, in_size, out_size):
-        """
-        :return single layer train time, in seconds
-        :param device: device type in ['sumsung_note10', 'redmi_note8', 'nexus6'] for small, middle, big
-        :param layer: in ['embedding', 'lstm', 'output']
-        :return:
-        """
-        redundent_outsize = 2 / 10000
-        if layer == 'embedding':
-            in_size /= 10000
-            out_size /= 1000
-        elif layer == 'lstm':
-            in_size /= 1000
-            out_size /= 1000
-        else:
-            in_size /= 1000
-            out_size /= 10000
-        batch_size /= 50
-        seq_len /= 10
-        model = models.load_model(os.path.join('model/lookup_table', device, '{}.h5'.format(layer)))
-        output = models.load_model(os.path.join('model/lookup_table', device, 'output.h5'))
-        x = [[in_size, out_size, batch_size, seq_len]]
-        redundent = [[out_size, redundent_outsize, batch_size, seq_len]]
-        if layer == 'embedding' or layer == 'lstm':
-            return model.predict(np.array(x)) - output.predict(np.array(redundent))
-        else:
-            return model.predict(np.array(x))
     
     def get_train_time_and_train_time_per_batch_and_train_time_per_epoch(self, model, num_sample, batch_size, num_epoch):
         '''

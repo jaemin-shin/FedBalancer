@@ -2,16 +2,13 @@ import numpy as np
 import timeout_decorator
 import traceback
 from utils.logger import Logger
-from utils.tf_utils import norm_grad
-from collections import defaultdict
+from utils.torch_utils import norm_grad
+from collections import defaultdict, OrderedDict
 import json
 import random
 import math
 import sys
-
-from grad_compress.grad_drop import GDropUpdate
-from grad_compress.sign_sgd import SignSGDUpdate,MajorityVote
-from comm_effi import StructuredUpdate
+import copy
 
 from baseline_constants import BYTES_WRITTEN_KEY, BYTES_READ_KEY, LOCAL_COMPUTATIONS_KEY
 
@@ -20,11 +17,10 @@ logger = L.get_logger()
 
 class Server:
     
-    def __init__(self, client_model, clients=[], cfg=None, deadline=0):
+    def __init__(self, model, clients=[], cfg=None, deadline=0):
         self._cur_time = 0      # simulation time
         self.cfg = cfg
-        self.client_model = client_model
-        self.model = client_model.get_params()
+        self.model = model
         self.selected_clients = []
         self.all_clients = clients
         self.updates = []
@@ -51,7 +47,7 @@ class Server:
 
         self.client_one_epoch_train_time_dict = {}
 
-        if self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer:
+        if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
             # Oort client selection variables
             self.client_overthreshold_loss_count = {}
             self.client_overthreshold_loss_sum = {}
@@ -70,7 +66,7 @@ class Server:
         if self.cfg.oort_blacklist:
             self.client_selected_count = {}
         
-        if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+        if self.cfg.fedbalancer or self.cfg.oortbalancer:
             # FEDBALANCER parameters
 
             # self.current_round_losses = []
@@ -84,15 +80,14 @@ class Server:
             self.prev_train_losses = []
 
         for c in self.all_clients:
-            self.clients_info[str(c.id)]["comp"] = 0
             self.clients_info[str(c.id)]["acc"] = 0.0
             self.clients_info[str(c.id)]["device"] = c.device.device_model
             self.client_download_time[str(c.id)] = []
             self.client_upload_time[str(c.id)] = []
             self.clients_info[str(c.id)]["sample_num"] = len(c.train_data['y'])
-            if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+            if self.cfg.fedbalancer or self.cfg.oortbalancer:
                 self.client_one_epoch_train_time_dict[str(c.id)] = -1
-            if self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer:
+            if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
                 self.client_one_epoch_train_time_dict[str(c.id)] = -1
                 self.client_overthreshold_loss_count[str(c.id)] = -1
                 self.client_overthreshold_loss_sum[str(c.id)] = -1
@@ -132,7 +127,7 @@ class Server:
                 if self.client_selected_count[str(c.id)] > self.cfg.oort_blacklist_rounds:
                     blacklist_clients.append(str(c.id))
 
-        if self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer:
+        if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
             # Sort client's recorded loss that is over current self.loss_threshold
             possible_clients_ids = []
             if self.cfg.behav_hete:
@@ -158,7 +153,7 @@ class Server:
                 if overthreshold_loss_count == -1 or overthreshold_loss_count == 0:
                     summ = 0
                 else:
-                    if self.cfg.realoort or self.cfg.realoortbalancer:
+                    if self.cfg.oort or self.cfg.oortbalancer:
                         summ = math.sqrt(summ / batch_size) * batch_size
                     elif self.cfg.fb_client_selection:
                         summ = math.sqrt(summ / overthreshold_loss_count) * overthreshold_loss_count
@@ -309,7 +304,7 @@ class Server:
             oort_pacer_utility_sum = 0
             for c_id in selected_clients_ids:
                 if self.cfg.oort_pacer:
-                    if self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer:
+                    if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
                         oort_pacer_utility_sum += self.client_utility[str(c_id)]
                 for p_c in possible_clients:
                     if c_id == str(p_c.id):
@@ -429,7 +424,7 @@ class Server:
         min_loss = sys.maxsize
 
         # Fedbalancer loss threshold and deadline update based on the loss threshold percentage (ratio) and the deadline percentage (ratio)
-        if (self.cfg.fedbalancer or self.cfg.realoortbalancer) and self.if_any_client_sent_response_for_current_round:
+        if (self.cfg.fedbalancer or self.cfg.oortbalancer) and self.if_any_client_sent_response_for_current_round:
             if self.loss_threshold == 0 and self.loss_threshold_percentage == 0:
                 self.loss_threshold = 0
                 logger.info('loss_threshold {}'.format(self.loss_threshold))
@@ -459,16 +454,12 @@ class Server:
             client_tmp_info = {
                 c.id: {
                     'simulate_time_c': 0,
-                    'comp': 0,
                     'num_samples': 0,
                     'update': 0,
                     'acc': 0,
                     'loss': 0,
-                    'gradiant': 0,
                     'update_size': 0,
                     'seed': 0,
-                    'shape_old': 0,
-                    'loss_old': 0,
                     'sorted_loss': 0,
                     'download_time': 0,
                     'upload_time': 0,
@@ -486,7 +477,7 @@ class Server:
                     'client_simulate_time': 0} for c in clients}
             client_simulate_times = []
 
-        if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+        if self.cfg.fedbalancer or self.cfg.oortbalancer:
             logger.info('this round deadline {}, loss_threshold {}'.format(self.deadline, self.loss_threshold))
             logger.info('this round deadline percentage {}, loss_threshold percentage {}'.format(self.deadline_percentage, self.loss_threshold_percentage))
         else:
@@ -495,9 +486,11 @@ class Server:
         curr_round_exploited_utility = 0.0
 
         for c in clients:
-            c.model.set_params(self.model)
+            c.model = copy.deepcopy(self.model)
+        
+        for c in clients:
             try:
-                if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+                if self.cfg.fedbalancer or self.cfg.oortbalancer:
                     c.set_deadline(self.deadline)
                     c.set_loss_threshold(self.loss_threshold, self.upper_loss_threshold)
                 else:
@@ -508,23 +501,17 @@ class Server:
                 start_t = self.get_cur_time()
                 
                 # train on the client
-                # gradiant here is actually (-1) * grad
-                simulate_time_c, comp, num_samples, update, acc, loss, gradiant, update_size, seed, shape_old, loss_old, sorted_loss, download_time, upload_time, train_time, inference_time, completed_epochs = c.train(start_t, num_epochs, batch_size, minibatch)
+                simulate_time_c, num_samples, update, acc, loss, update_size, sorted_loss, download_time, upload_time, train_time, inference_time, completed_epochs = c.train(start_t, num_epochs, batch_size, minibatch)
 
                 # These are the two cases which the round does not end with deadline; it ends when predefined number of clients succeed in a round
                 # Thus, these two cases are handled separately from other cases
                 if self.cfg.oort_pacer or self.cfg.ddl_baseline_smartpc:
                     client_tmp_info[c.id]['simulate_time_c'] = simulate_time_c
-                    client_tmp_info[c.id]['comp'] = comp
                     client_tmp_info[c.id]['num_samples'] = num_samples
                     client_tmp_info[c.id]['update'] = update
                     client_tmp_info[c.id]['acc'] = acc
                     client_tmp_info[c.id]['loss'] = loss
-                    client_tmp_info[c.id]['gradiant'] = gradiant
                     client_tmp_info[c.id]['update_size'] = update_size
-                    client_tmp_info[c.id]['seed'] = seed
-                    client_tmp_info[c.id]['shape_old'] = shape_old
-                    client_tmp_info[c.id]['loss_old'] = loss_old
                     client_tmp_info[c.id]['sorted_loss'] = sorted_loss
                     client_tmp_info[c.id]['download_time'] = download_time
                     client_tmp_info[c.id]['upload_time'] = upload_time
@@ -551,11 +538,11 @@ class Server:
 
                     # In case of using Oort-based client selection, when we do not use pacer, the round ends with the deadline.
                     # We calculate the curr_round_exploited_utility from the successful clients at the round.
-                    if (self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer) and not self.cfg.oort_pacer:
+                    if (self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer) and not self.cfg.oort_pacer:
                         curr_round_exploited_utility += self.client_utility[str(c.id)]
                     
                     # If everyone is at least once selected for a round, we set epsilon as zero, which is the exploration-exploitation parameter of Oort
-                    if (self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer) and self.epsilon != 0:
+                    if (self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer) and self.epsilon != 0:
                         is_everyone_explored = True
                         for value in self.client_one_epoch_train_time_dict.values():
                             if value == -1:
@@ -565,7 +552,7 @@ class Server:
                             self.epsilon = 0.0
 
                     # calculate succeeded client's round duration for oort pacer
-                    if self.cfg.oort_pacer and (self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer) :
+                    if self.cfg.oort_pacer and (self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer) :
                         self.client_last_selected_round_duration[str(c.id)] = download_time + train_time + upload_time + inference_time
                     
                     # in FedBalancer algorithm, this is done in client-side.
@@ -578,7 +565,7 @@ class Server:
                             min_loss = sorted_loss[0]
                         if sorted_loss[-1] > max_loss:
                             max_loss = sorted_loss[-1]
-                        if self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer:
+                        if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
                             summ = 0
                             overthreshold_loss_count = 0
                             for loss_idx in range(len(sorted_loss)):
@@ -587,7 +574,7 @@ class Server:
                                     overthreshold_loss_count += 1
                             self.client_overthreshold_loss_sum[str(c.id)] = summ
                             self.client_overthreshold_loss_count[str(c.id)] = overthreshold_loss_count
-                        if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+                        if self.cfg.fedbalancer or self.cfg.oortbalancer:
                             self.if_any_client_sent_response_for_current_round = True
                             noise1 = np.random.normal(0, self.cfg.noise_factor, 1)[0]
                             noise2 = np.random.normal(0, self.cfg.noise_factor, 1)[0]
@@ -604,43 +591,21 @@ class Server:
 
                     sys_metrics[c.id][BYTES_READ_KEY] += c.model.size
                     sys_metrics[c.id][BYTES_WRITTEN_KEY] += update_size
-                    sys_metrics[c.id][LOCAL_COMPUTATIONS_KEY] = comp
                     sys_metrics[c.id]['acc'] = acc
                     sys_metrics[c.id]['loss'] = loss
                     # uploading 
                     self.updates.append((c.id, num_samples, update))
 
-                    if self.cfg.structure_k:
-                        if not self.structure_updater:
-                            self.structure_updater = StructuredUpdate(self.cfg.structure_k, seed)
-                        gradiant = self.structure_updater.regain_grad(shape_old, gradiant)
-                        
-                    self.gradiants.append((c.id, num_samples, gradiant))
-
-                    if self.cfg.qffl:
-                        q = self.cfg.qffl_q
-                        self.deltas.append([np.float_power(loss_old + 1e-10, q) * grad for grad in gradiant])
-                        self.hs.append(q * np.float_power(loss_old + 1e-10, (q - 1)) * norm_grad(gradiant) + (1.0 / self.client_model.lr) * np.float_power(loss_old + 1e-10, q))
-                    
-                    norm_comp = int(comp/self.client_model.flops)
-                    if norm_comp == 0:
-                        logger.error('comp: {}, flops: {}'.format(comp, self.client_model.flops))
-                        assert False
-                    self.clients_info[str(c.id)]["comp"] += norm_comp
                     logger.debug('client {} upload successfully with acc {}, loss {}'.format(c.id,acc,loss))
             except timeout_decorator.timeout_decorator.TimeoutError as e:
                 logger.debug('client {} failed: {}'.format(c.id, e))
-                actual_comp = c.get_actual_comp()
-                norm_comp = int(actual_comp/self.client_model.flops)
-                self.clients_info[str(c.id)]["comp"] += norm_comp
                 
                 sys_metrics[c.id]['acc'] = -1
                 sys_metrics[c.id]['loss'] = -1
                 sys_metrics[c.id][BYTES_READ_KEY] += c.model.size
                 sys_metrics[c.id][BYTES_WRITTEN_KEY] += c.update_size
-                sys_metrics[c.id][LOCAL_COMPUTATIONS_KEY] += actual_comp
                 
-                if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+                if self.cfg.fedbalancer or self.cfg.oortbalancer:
                     simulate_time = self.deadline
                     # in FedBalancer algorithm, this is done in client-side.
                     # doing this here makes no difference in performance and privacy (because we do not use sample-level information other than calculating the overthreshold sum and count)
@@ -654,7 +619,7 @@ class Server:
                             if c.sorted_loss[len(c.sorted_loss)-1-loss_idx] > self.loss_threshold:
                                 summ += c.sorted_loss[len(c.sorted_loss)-1-loss_idx]*c.sorted_loss[len(c.sorted_loss)-1-loss_idx]
                                 overthreshold_loss_count += 1
-                        if self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer:
+                        if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
                             self.client_overthreshold_loss_sum[str(c.id)] = summ
                             self.client_overthreshold_loss_count[str(c.id)] = overthreshold_loss_count
                         
@@ -699,7 +664,7 @@ class Server:
                 self.client_upload_time[str(c_id)].append(client_tmp_info[c_id]['upload_time'])
 
                 self.client_one_epoch_train_time_dict[str(c_id)] = client_tmp_info[c_id]['train_time']/client_tmp_info[c_id]['completed_epochs']
-                if (self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer) and self.epsilon != 0:
+                if (self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer) and self.epsilon != 0:
                     is_everyone_explored = True
                     for value in self.client_one_epoch_train_time_dict.values():
                         if value == -1:
@@ -709,7 +674,7 @@ class Server:
                         self.epsilon = 0.0
 
                 # calculate succeeded client's round duration for oort pacer
-                if self.cfg.oort_pacer and (self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer):
+                if self.cfg.oort_pacer and (self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer):
                     self.client_last_selected_round_duration[str(c.id)] = download_time + train_time + upload_time + inference_time
                 
                 # in FedBalancer algorithm, this is done in client-side.
@@ -723,7 +688,7 @@ class Server:
                         min_loss = client_tmp_info[c_id]['sorted_loss'][0]
                     if client_tmp_info[c_id]['sorted_loss'][-1] > max_loss:
                         max_loss = client_tmp_info[c_id]['sorted_loss'][-1]
-                    if self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer:
+                    if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
                         #self.client_loss[c_id] = client_tmp_info[c_id]['sorted_loss']
                         # self.client_loss_count[c_id] = len(client_tmp_info[c_id]['sorted_loss'])
                         summ = 0
@@ -735,7 +700,7 @@ class Server:
                         self.client_overthreshold_loss_sum[c_id] = summ
                         self.client_overthreshold_loss_count[c_id] = overthreshold_loss_count
 
-                    if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+                    if self.cfg.fedbalancer or self.cfg.oortbalancer:
                         # self.current_round_losses = self.current_round_losses + client_tmp_info[c_id]['sorted_loss']
                         self.if_any_client_sent_response_for_current_round = True
                         noise1 = np.random.normal(0, self.cfg.noise_factor, 1)[0]
@@ -749,7 +714,7 @@ class Server:
                 accs.append(client_tmp_info[c_id]['acc'])
                 losses.append(client_tmp_info[c_id]['loss'])
 
-                if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+                if self.cfg.fedbalancer or self.cfg.oortbalancer:
                     simulate_time = min(self.deadline, max(simulate_time, client_tmp_info[c_id]['simulate_time_c']))
                 elif self.cfg.oort_pacer or self.cfg.ddl_baseline_smartpc:
                     simulate_time = max(simulate_time, client_tmp_info[c_id]['client_simulate_time'])
@@ -758,30 +723,11 @@ class Server:
 
                 sys_metrics[c_id][BYTES_READ_KEY] += client_tmp_info[c_id]['c_model_size']
                 sys_metrics[c_id][BYTES_WRITTEN_KEY] += client_tmp_info[c_id]['update_size']
-                sys_metrics[c_id][LOCAL_COMPUTATIONS_KEY] = client_tmp_info[c_id]['comp']
                 sys_metrics[c_id]['acc'] = client_tmp_info[c_id]['acc']
                 sys_metrics[c_id]['loss'] = client_tmp_info[c_id]['loss']
                 # uploading 
                 self.updates.append((c_id, client_tmp_info[c_id]['num_samples'], client_tmp_info[c_id]['update']))
 
-                if self.cfg.structure_k:
-                    if not self.structure_updater:
-                        self.structure_updater = StructuredUpdate(self.cfg.structure_k, client_tmp_info[c_id]['seed'])
-                    gradiant = self.structure_updater.regain_grad(client_tmp_info[c_id]['shape_old'], client_tmp_info[c_id]['gradiant'])
-                    
-                self.gradiants.append((c_id, client_tmp_info[c_id]['num_samples'], client_tmp_info[c_id]['gradiant']))
-
-                if self.cfg.qffl:
-                    q = self.cfg.qffl_q
-                    # gradiant = [(-1) * grad for grad in gradiant]
-                    self.deltas.append([np.float_power(client_tmp_info[c_id]['loss_old'] + 1e-10, q) * grad for grad in client_tmp_info[c_id]['gradiant']])
-                    self.hs.append(q * np.float_power(client_tmp_info[c_id]['loss_old'] + 1e-10, (q - 1)) * norm_grad(client_tmp_info[c_id]['gradiant']) + (1.0 / self.client_model.lr) * np.float_power(client_tmp_info[c_id]['loss_old'] + 1e-10, q))
-                
-                norm_comp = int(client_tmp_info[c_id]['comp']/self.client_model.flops)
-                if norm_comp == 0:
-                    logger.error('comp: {}, flops: {}'.format(client_tmp_info[c_id]['comp'], self.client_model.flops))
-                    assert False
-                self.clients_info[str(c_id)]["comp"] += norm_comp
                 logger.debug('client {} upload successfully with acc {}, loss {}'.format(c_id,client_tmp_info[c_id]['acc'], client_tmp_info[c_id]['loss']))
 
                 if self.cfg.compress_algo:
@@ -806,12 +752,12 @@ class Server:
             # In case of using Oort-based client selection, when we do not use pacer, the round ends with the deadline.
             # We calculate the curr_round_exploited_utility from the successful clients at the round.
             if not self.cfg.oort_pacer:
-                if self.cfg.fb_client_selection or self.cfg.realoort or self.cfg.realoortbalancer:
+                if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
                     self.round_exploited_utility.append(curr_round_exploited_utility)
             
             # Update the loss threshold percentage (ratio) and the deadline percentage (ratio) 
             # according to the Algorithm 3 in FedBalancer paper
-            if self.cfg.fedbalancer or self.cfg.realoortbalancer:
+            if self.cfg.fedbalancer or self.cfg.oortbalancer:
                 current_round_loss = (sorted_loss_sum / num_of_samples) / (self.deadline)
                 self.prev_train_losses.append(current_round_loss)
                 logger.info('current_round_loss: {}'.format(current_round_loss))
@@ -855,63 +801,26 @@ class Server:
             if self.cfg.no_training:
                 logger.info('pseduo-update because of no_training setting.')
                 self.updates = []
-                self.gradiants = []
                 self.deltas = []
                 self.hs = []
                 return
-            if self.cfg.aggregate_algorithm == 'FedAvg':
-                # aggregate all the clients
-                logger.info('Aggragate with FedAvg')
-                used_client_ids = [cid for (cid, client_samples, client_model) in self.updates]
-                total_weight = 0.
-                base = [0] * len(self.updates[0][2])
-                for (cid, client_samples, client_model) in self.updates:
-                    total_weight += client_samples
-                    for i, v in enumerate(client_model):
-                        base[i] += (client_samples * v.astype(np.float64))
-                for c in self.all_clients:
-                    if c.id not in used_client_ids:
-                        # c was not trained in this round
-                        params = self.model
-                        total_weight += c.num_train_samples  # assume that all train_data is used to update
-                        for i, v in enumerate(params):
-                            base[i] += (c.num_train_samples * v.astype(np.float64))
-                averaged_soln = [v / total_weight for v in base]
-                self.model = averaged_soln
-            
-            elif self.cfg.aggregate_algorithm == 'SucFedAvg':
+            if self.cfg.aggregate_algorithm == 'SucFedAvg':
                 # aggregate the successfully uploaded clients
                 logger.info('Aggragate with SucFedAvg')
                 total_weight = 0.
-                base = [0] * len(self.updates[0][2])
-                for (cid, client_samples, client_model) in self.updates:
-                    # logger.info('cid: {}, client_samples: {}, client_model: {}'.format(cid, client_samples, client_model[0][0][:5]))
-                    total_weight += client_samples
-                    for i, v in enumerate(client_model):
-                        base[i] += (client_samples * v.astype(np.float64))
-                averaged_soln = [v / total_weight for v in base]
-                self.model = averaged_soln
-            
-            elif self.cfg.aggregate_algorithm == 'SelFedAvg':
-                # aggregate the selected clients
-                logger.info('Aggragate with SelFedAvg')
-                used_client_ids = [cid for (cid, client_samples, client_model) in self.updates]
-                total_weight = 0.
-                base = [0] * len(self.updates[0][2])
-                for (cid, client_samples, client_model) in self.updates:
-                    total_weight += client_samples
-                    for i, v in enumerate(client_model):
-                        base[i] += (client_samples * v.astype(np.float64))
-                for c in self.selected_clients:
-                    if c.id not in used_client_ids:
-                        # c was failed in this round but was selected
-                        params = self.model
-                        total_weight += c.num_train_samples  # assume that all train_data is used to update
-                        for i, v in enumerate(params):
-                            base[i] += (c.num_train_samples * v.astype(np.float64))
-                averaged_soln = [v / total_weight for v in base]
-                self.model = averaged_soln
-            
+
+
+                total_data_size = sum([client_num_samples for (cid, client_num_samples, client_model_state) in self.updates])
+                aggregation_weights = [client_num_samples / total_data_size for (cid, client_num_samples, client_model_state) in self.updates]
+
+                update_state = OrderedDict()
+                for k, (cid, client_samples, client_model) in enumerate(self.updates):
+                    for key in self.model.net.state_dict().keys():
+                        if k == 0:
+                            update_state[key] = client_model[key] * aggregation_weights[k]
+                        else:
+                            update_state[key] += client_model[key] * aggregation_weights[k]
+                self.model.net.load_state_dict(update_state)
             else:
                 # not supported aggregating algorithm
                 logger.error('not supported aggregating algorithm: {}'.format(self.cfg.aggregate_algorithm))
@@ -923,127 +832,8 @@ class Server:
             
         
         self.updates = []
-        self.gradiants = []
         self.deltas = []
         self.hs = []
-
-    def update_using_compressed_grad(self, update_frac):
-        logger.info('{} of {} clients upload successfully'.format(len(self.updates), len(self.selected_clients)))
-        if len(self.gradiants) / len(self.selected_clients) >= update_frac:        
-            logger.info('round succeed, updating global model...')
-            if self.cfg.no_training:
-                logger.info('pseduo-update because of no_training setting.')
-                self.updates = []
-                self.gradiants = []
-                self.deltas = []
-                self.hs = []
-                return
-            if self.cfg.aggregate_algorithm == 'FedAvg':
-                # aggregate all the clients
-                logger.info('Aggragate with FedAvg after grad compress')
-                used_client_ids = [cid for (cid, _, _) in self.gradiants]
-                total_weight = 0.
-                base = [0] * len(self.updates[0][2])
-                for (cid, client_samples, client_grad) in self.gradiants:
-                    total_weight += client_samples
-                    for i, v in enumerate(client_grad):
-                        base[i] += (client_samples * v.astype(np.float32))
-                for c in self.all_clients:
-                    if c.id not in used_client_ids:
-                        total_weight += c.num_train_samples
-                averaged_grad = [v / total_weight for v in base]
-                # update with grad                    
-                if self.cfg.compress_algo == 'sign_sgd':
-                    averaged_grad = MajorityVote(averaged_grad)
-                self.model = self.client_model.update_with_gradiant(averaged_grad)                    
-
-            elif self.cfg.aggregate_algorithm == 'SucFedAvg':
-                # aggregate the successfully uploaded clients
-                logger.info('Aggragate with SucFedAvg after grad compress')
-                total_weight = 0.
-                base = [0] * len(self.updates[0][2])
-                for (cid, client_samples, client_grad) in self.gradiants:
-                    # logger.info('cid: {}, client_samples: {}, client_model: {}'.format(cid, client_samples, client_model[0][0][:5]))
-                    total_weight += client_samples
-                    # logger.info("client-grad: {}, c-g[0]: {}".format(type(client_grad), type(client_grad[0])))
-                    for i, v in enumerate(client_grad):
-                        base[i] += (client_samples * v.astype(np.float32))
-                averaged_grad = [v / total_weight for v in base]
-                # update with grad                    
-                if self.cfg.compress_algo == 'sign_sgd':
-                    averaged_grad = MajorityVote(averaged_grad)
-                self.model = self.client_model.update_with_gradiant(averaged_grad)
-            
-            elif self.cfg.aggregate_algorithm == 'SelFedAvg':
-                # aggregate the selected clients
-                logger.info('Aggragate with SelFedAvg after grad compress')
-                used_client_ids = [cid for (cid, _, _) in self.gradiants]
-                total_weight = 0.
-                base = [0] * len(self.updates[0][2])
-                for (cid, client_samples, client_grad) in self.gradiants:
-                    total_weight += client_samples
-                    for i, v in enumerate(client_grad):
-                        base[i] += (client_samples * v.astype(np.float32))
-                for c in self.selected_clients:
-                    if c.id not in used_client_ids:
-                        # c was failed in this round but was selected
-                        total_weight += c.num_train_samples  # assume that all train_data is used to update
-                averaged_grad = [v / total_weight for v in base]
-                # update with grad                    
-                if self.cfg.compress_algo == 'sign_sgd':
-                    averaged_grad = MajorityVote(averaged_grad)
-                self.model = self.client_model.update_with_gradiant(averaged_grad)
-            
-            else:
-                # not supported aggregating algorithm
-                logger.error('not supported aggregating algorithm: {}'.format(self.cfg.aggregate_algorithm))
-                assert False
-                
-        else:
-            logger.info('round failed, global model maintained.')
-            if self.deadline_percentage + 0.05 <= 1.0:
-                self.deadline_percentage = self.deadline_percentage + 0.05
-        
-        self.updates = []
-        self.gradiants = []
-        self.deltas = []
-        self.hs = []
-
-    def update_using_qffl(self, update_frac):
-        logger.info('{} of {} clients upload successfully'.format(len(self.updates), len(self.selected_clients)))
-        if len(self.gradiants) / len(self.selected_clients) >= update_frac:        
-            logger.info('round succeed, updating global model...')
-            if self.cfg.no_training:
-                logger.info('pseduo-update because of no_training setting.')
-                self.updates = []
-                self.gradiants = []
-                self.deltas = []
-                self.hs = []
-                return
-            
-            # aggregate using q-ffl
-            demominator = np.sum(np.asarray(self.hs))
-            num_clients = len(self.deltas)
-            scaled_deltas = []
-            for client_delta in self.deltas:
-                scaled_deltas.append([layer * 1.0 / demominator for layer in client_delta])
-
-            updates = []
-            for i in range(len(self.deltas[0])):
-                tmp = scaled_deltas[0][i]
-                for j in range(1, len(self.deltas)):
-                    tmp += scaled_deltas[j][i]
-                updates.append(tmp)
-
-            self.model = [(u - v) * 1.0 for u, v in zip(self.model, updates)]
-
-            self.updates = []
-            self.gradiants = []
-            self.deltas = []
-            self.hs = []
-
-        else:
-            logger.info('round failed, global model maintained.')
         
     def test_model(self, clients_to_test, set_to_use='test'):
         """Tests self.model on given clients.
@@ -1061,7 +851,7 @@ class Server:
             assert False
 
         for client in clients_to_test:
-            client.model.set_params(self.model)
+            client.model = copy.deepcopy(self.model)
             c_metrics = client.test(set_to_use)
             # logger.info('client {} metrics: {}'.format(client.id, c_metrics))
             metrics[client.id] = c_metrics
@@ -1087,16 +877,6 @@ class Server:
         groups = {c.id: c.group for c in clients}
         num_samples = {c.id: c.num_samples for c in clients}
         return ids, groups, num_samples
-
-    def save_model(self, path):
-        """Saves the server model on checkpoints/dataset/model.ckpt."""
-        # Save server model
-        self.client_model.set_params(self.model)
-        model_sess =  self.client_model.sess
-        return self.client_model.saver.save(model_sess, path)
-
-    def close_model(self):
-        self.client_model.close()
     
     def get_cur_time(self):
         return self._cur_time

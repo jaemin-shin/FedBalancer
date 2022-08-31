@@ -1,9 +1,9 @@
-from tensorflow.python.ops import control_flow_ops
-from tensorflow.python.ops import math_ops
-from tensorflow.python.ops import state_ops
-from tensorflow.python.framework import ops
-from tensorflow.python.training import optimizer
-import tensorflow as tf
+# from tensorflow.python.ops import control_flow_ops
+# from tensorflow.python.ops import math_ops
+# from tensorflow.python.ops import state_ops
+# from tensorflow.python.framework import ops
+# from tensorflow.python.training import optimizer
+# import tensorflow as tf
 
 
 class PerturbedGradientDescent(optimizer.Optimizer):
