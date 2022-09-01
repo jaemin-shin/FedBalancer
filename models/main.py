@@ -57,10 +57,10 @@ def main():
 
     # Check if the model files for the given dataset exists
     model_net_path = '%s/%s.py' % (cfg.dataset, cfg.model)
-    model_path = '%s.client_model' % (cfg.dataset)
-    if not os.path.exists(model_net_path) or not os.path.exists(model_path):
+    if not os.path.exists(model_net_path):
         logger.error('Please specify a valid dataset and a valid model.')
         assert False
+    model_path = '%s.client_model' % (cfg.dataset)
     
     logger.info('############################## %s ##############################' % model_path)
     mod = importlib.import_module(model_path)
