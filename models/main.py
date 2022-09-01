@@ -239,9 +239,6 @@ def main():
 
     test_stat_metrics = server.test_model(test_clients, set_to_use='test')
     current_test_accuracy = print_metrics(test_stat_metrics, sc_num_samples, prefix='test_')
-            
-    # Close models
-    server.close_model()
 
 def online(clients, cur_time, time_window):
     # """We assume all users are always online."""
