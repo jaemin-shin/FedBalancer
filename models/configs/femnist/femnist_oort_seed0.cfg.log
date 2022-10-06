@@ -185,3 +185,20 @@
 2022-10-07 00:44:40,065 - FL-type - INFO - selected num: 130
 2022-10-07 00:44:40,066 - FL-type - INFO - --------------------- configuration stage ---------------------
 2022-10-07 00:44:40,066 - FL-type - INFO - this round deadline 143
+2022-10-07 00:45:33,786 - FL-type - INFO - average acc: 0.11422222222222216, average loss: 3.5212054514884947
+2022-10-07 00:45:33,786 - FL-type - INFO - configuration and update stage simulation time: 24.707569949454804
+2022-10-07 00:45:33,788 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:45:33,788 - FL-type - INFO - 100 of 130 clients upload successfully
+2022-10-07 00:45:33,789 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:45:33,789 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:45:34,129 - FL-type - INFO - --------------------- test result ---------------------
+2022-10-07 00:45:36,308 - FL-type - INFO - test_accuracy: 0.050825840188763474, 10th percentile: 0.028488105313605724, 50th percentile: 0.067816091954023, 90th percentile 0.07780635911276039
+2022-10-07 00:45:36,308 - FL-type - INFO - test_loss: 3.8191218459023086, 10th percentile: 3.602239656448364, 50th percentile: 3.632470726966858, 90th percentile 4.021812629699707
+2022-10-07 00:45:36,309 - FL-type - INFO - ===================== Round 6 of 6000 =====================
+2022-10-07 00:45:36,309 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:45:36,309 - FL-type - INFO - current time: 214.8684447189343	time window: 20.0	
+2022-10-07 00:45:36,310 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:45:36,331 - FL-type - INFO - epsilon 0.830131344
+2022-10-07 00:45:36,331 - FL-type - INFO - selected num: 130
+2022-10-07 00:45:36,332 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:45:36,332 - FL-type - INFO - this round deadline 143
