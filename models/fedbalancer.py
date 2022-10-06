@@ -276,7 +276,7 @@ class FedBalancer:
         else:
             loss_low = np.min(self.current_round_loss_min)
             loss_high = np.mean(self.current_round_loss_max)
-            self.loss_threshold = loss_low + (loss_high - loss_low) * self.loss_threshold_percentage
+            self.loss_threshold = loss_low + (loss_high - loss_low) * self.loss_threshold_ratio
             logger.info('loss_low {}, loss_high {}, loss_threshold {}'.format(loss_low, loss_high, self.loss_threshold))
     
     # Algorithm 3 from the FedBalancer paper
