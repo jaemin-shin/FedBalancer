@@ -1225,3 +1225,132 @@
 2022-10-07 00:46:11,768 - FL-type - INFO - deadline_low 31, deadline_high 34, deadline 34.0
 2022-10-07 00:46:11,768 - FL-type - INFO - this round deadline 34.0, loss_threshold 0
 2022-10-07 00:46:11,768 - FL-type - INFO - this round deadline ratio 1.0, loss_threshold ratio 0.0
+2022-10-07 00:46:45,427 - FL-type - INFO - average acc: 0.09507575757575756, average loss: 3.588138013691097
+2022-10-07 00:46:45,427 - FL-type - INFO - configuration and update stage simulation time: 34.0
+2022-10-07 00:46:45,427 - FL-type - INFO - current_round_loss: 0.11169049312724148
+2022-10-07 00:46:45,427 - FL-type - INFO - min sample loss: 2.9813523292541504, max sample loss: 5.440816402435303
+2022-10-07 00:46:45,428 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:46:45,428 - FL-type - INFO - 77 of 100 clients upload successfully
+2022-10-07 00:46:45,428 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:46:45,428 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:46:45,851 - FL-type - INFO - ===================== Round 57 of 6000 =====================
+2022-10-07 00:46:45,852 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:46:45,852 - FL-type - INFO - current time: 3116.0	time window: 20.0	
+2022-10-07 00:46:45,852 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:46:45,891 - FL-type - INFO - selected num: 100
+2022-10-07 00:46:45,891 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:46:45,891 - FL-type - INFO - loss_threshold 0
+2022-10-07 00:46:45,905 - FL-type - INFO - deadline_low 29, deadline_high 34, deadline 34.0
+2022-10-07 00:46:45,905 - FL-type - INFO - this round deadline 34.0, loss_threshold 0
+2022-10-07 00:46:45,905 - FL-type - INFO - this round deadline ratio 1.0, loss_threshold ratio 0.0
+2022-10-07 00:47:16,704 - FL-type - INFO - average acc: 0.06525974025974028, average loss: 3.526165550405329
+2022-10-07 00:47:16,704 - FL-type - INFO - configuration and update stage simulation time: 34.0
+2022-10-07 00:47:16,704 - FL-type - INFO - current_round_loss: 0.1091539084592605
+2022-10-07 00:47:16,704 - FL-type - INFO - min sample loss: 2.927936315536499, max sample loss: 5.374786376953125
+2022-10-07 00:47:16,706 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:47:16,706 - FL-type - INFO - 77 of 100 clients upload successfully
+2022-10-07 00:47:16,706 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:47:16,706 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:47:16,821 - FL-type - INFO - ===================== Round 58 of 6000 =====================
+2022-10-07 00:47:16,821 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:47:16,821 - FL-type - INFO - current time: 3170.0	time window: 20.0	
+2022-10-07 00:47:16,821 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:47:16,850 - FL-type - INFO - selected num: 100
+2022-10-07 00:47:16,850 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:47:16,850 - FL-type - INFO - loss_threshold 0
+2022-10-07 00:47:16,859 - FL-type - INFO - deadline_low 29, deadline_high 34, deadline 34.0
+2022-10-07 00:47:16,859 - FL-type - INFO - this round deadline 34.0, loss_threshold 0
+2022-10-07 00:47:16,859 - FL-type - INFO - this round deadline ratio 1.0, loss_threshold ratio 0.0
+2022-10-07 00:47:42,326 - FL-type - INFO - average acc: 0.09235555555555555, average loss: 3.532912654876709
+2022-10-07 00:47:42,326 - FL-type - INFO - configuration and update stage simulation time: 34.0
+2022-10-07 00:47:42,326 - FL-type - INFO - current_round_loss: 0.11018861947340124
+2022-10-07 00:47:42,327 - FL-type - INFO - min sample loss: 2.942028045654297, max sample loss: 5.464842319488525
+2022-10-07 00:47:42,328 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:47:42,329 - FL-type - INFO - 75 of 100 clients upload successfully
+2022-10-07 00:47:42,329 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:47:42,329 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:47:42,573 - FL-type - INFO - ===================== Round 59 of 6000 =====================
+2022-10-07 00:47:42,573 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:47:42,573 - FL-type - INFO - current time: 3224.0	time window: 20.0	
+2022-10-07 00:47:42,574 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:47:42,613 - FL-type - INFO - selected num: 100
+2022-10-07 00:47:42,613 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:47:42,613 - FL-type - INFO - loss_threshold 0
+2022-10-07 00:47:42,626 - FL-type - INFO - deadline_low 29, deadline_high 34, deadline 34.0
+2022-10-07 00:47:42,626 - FL-type - INFO - this round deadline 34.0, loss_threshold 0
+2022-10-07 00:47:42,626 - FL-type - INFO - this round deadline ratio 1.0, loss_threshold ratio 0.0
+2022-10-07 00:48:07,628 - FL-type - INFO - average acc: 0.0893854166666666, average loss: 3.5894657522439957
+2022-10-07 00:48:07,628 - FL-type - INFO - configuration and update stage simulation time: 34.0
+2022-10-07 00:48:07,629 - FL-type - INFO - current_round_loss: 0.11177463367581368
+2022-10-07 00:48:07,629 - FL-type - INFO - min sample loss: 2.8896021842956543, max sample loss: 5.6241350173950195
+2022-10-07 00:48:07,631 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:48:07,632 - FL-type - INFO - 80 of 100 clients upload successfully
+2022-10-07 00:48:07,632 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:48:07,632 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:48:08,552 - FL-type - INFO - ===================== Round 60 of 6000 =====================
+2022-10-07 00:48:08,554 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:48:08,555 - FL-type - INFO - current time: 3278.0	time window: 20.0	
+2022-10-07 00:48:08,555 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:48:08,616 - FL-type - INFO - selected num: 100
+2022-10-07 00:48:08,623 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:48:08,623 - FL-type - INFO - loss_threshold 0
+2022-10-07 00:48:08,650 - FL-type - INFO - deadline_low 27, deadline_high 34, deadline 34.0
+2022-10-07 00:48:08,653 - FL-type - INFO - this round deadline 34.0, loss_threshold 0
+2022-10-07 00:48:08,653 - FL-type - INFO - this round deadline ratio 1.0, loss_threshold ratio 0.0
+2022-10-07 00:48:33,001 - FL-type - INFO - average acc: 0.08538541666666664, average loss: 3.585450899600983
+2022-10-07 00:48:33,002 - FL-type - INFO - configuration and update stage simulation time: 34.0
+2022-10-07 00:48:33,002 - FL-type - INFO - current_round_loss: 0.11184136439772213
+2022-10-07 00:48:33,002 - FL-type - INFO - min sample loss: 2.9787960052490234, max sample loss: 5.568303108215332
+2022-10-07 00:48:33,003 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:48:33,003 - FL-type - INFO - 80 of 100 clients upload successfully
+2022-10-07 00:48:33,003 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:48:33,003 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:48:33,162 - FL-type - INFO - --------------------- test result ---------------------
+2022-10-07 00:48:34,835 - FL-type - INFO - test_accuracy: 0.05407818378929915, 10th percentile: 0.031209416421017915, 50th percentile: 0.06949698189134809, 90th percentile 0.08711244698810063
+2022-10-07 00:48:34,836 - FL-type - INFO - test_loss: 3.6746308716893856, 10th percentile: 3.578602695465088, 50th percentile: 3.6275811195373535, 90th percentile 3.7776843786239622
+2022-10-07 00:48:34,836 - FL-type - INFO - ===================== Round 61 of 6000 =====================
+2022-10-07 00:48:34,836 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:48:34,836 - FL-type - INFO - current time: 3332.0	time window: 20.0	
+2022-10-07 00:48:34,837 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:48:34,964 - FL-type - INFO - selected num: 100
+2022-10-07 00:48:34,965 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:48:34,971 - FL-type - INFO - loss_threshold 0
+2022-10-07 00:48:35,004 - FL-type - INFO - deadline_low 27, deadline_high 34, deadline 34.0
+2022-10-07 00:48:35,014 - FL-type - INFO - this round deadline 34.0, loss_threshold 0
+2022-10-07 00:48:35,014 - FL-type - INFO - this round deadline ratio 1.0, loss_threshold ratio 0.0
+2022-10-07 00:48:58,122 - FL-type - INFO - average acc: 0.0811431623931624, average loss: 3.5603048495757275
+2022-10-07 00:48:58,123 - FL-type - INFO - configuration and update stage simulation time: 34.0
+2022-10-07 00:48:58,123 - FL-type - INFO - current_round_loss: 0.11124605096842909
+2022-10-07 00:48:58,123 - FL-type - INFO - min sample loss: 2.960252523422241, max sample loss: 5.535379409790039
+2022-10-07 00:48:58,124 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:48:58,124 - FL-type - INFO - 78 of 100 clients upload successfully
+2022-10-07 00:48:58,124 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:48:58,124 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:48:58,794 - FL-type - INFO - ===================== Round 62 of 6000 =====================
+2022-10-07 00:48:58,794 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:48:58,794 - FL-type - INFO - current time: 3386.0	time window: 20.0	
+2022-10-07 00:48:58,795 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:48:58,841 - FL-type - INFO - selected num: 100
+2022-10-07 00:48:58,841 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:48:58,841 - FL-type - INFO - loss_threshold 0
+2022-10-07 00:48:58,854 - FL-type - INFO - deadline_low 31, deadline_high 34, deadline 34.0
+2022-10-07 00:48:58,854 - FL-type - INFO - this round deadline 34.0, loss_threshold 0
+2022-10-07 00:48:58,855 - FL-type - INFO - this round deadline ratio 1.0, loss_threshold ratio 0.0
+2022-10-07 00:49:22,757 - FL-type - INFO - average acc: 0.08656798245614034, average loss: 3.5634066117437264
+2022-10-07 00:49:22,758 - FL-type - INFO - configuration and update stage simulation time: 34.0
+2022-10-07 00:49:22,758 - FL-type - INFO - current_round_loss: 0.11027104534416377
+2022-10-07 00:49:22,758 - FL-type - INFO - min sample loss: 2.9651072025299072, max sample loss: 5.462643623352051
+2022-10-07 00:49:22,760 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:49:22,760 - FL-type - INFO - 76 of 100 clients upload successfully
+2022-10-07 00:49:22,760 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:49:22,760 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:49:22,898 - FL-type - INFO - ===================== Round 63 of 6000 =====================
+2022-10-07 00:49:22,899 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:49:22,899 - FL-type - INFO - current time: 3440.0	time window: 20.0	
+2022-10-07 00:49:22,900 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:49:22,941 - FL-type - INFO - selected num: 100
+2022-10-07 00:49:22,942 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:49:22,942 - FL-type - INFO - loss_threshold 0
+2022-10-07 00:49:22,955 - FL-type - INFO - deadline_low 29, deadline_high 34, deadline 34.0
+2022-10-07 00:49:22,956 - FL-type - INFO - this round deadline 34.0, loss_threshold 0
+2022-10-07 00:49:22,956 - FL-type - INFO - this round deadline ratio 1.0, loss_threshold ratio 0.0
