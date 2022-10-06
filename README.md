@@ -45,7 +45,7 @@ $ conda install pip
 ### Deactivate and re-activate the conda env to activate pip inside conda env
 ```
 $ while [ ! -z $CONDA_PREFIX ]; do conda deactivate; done
-$ conda activate fb-torch-dona
+$ conda activate fb-torch-conda
 ```
 
 ### Install other dependencies
@@ -53,59 +53,45 @@ $ conda activate fb-torch-dona
 ```
 $ git clone https://github.com/jaemin-shin/FedBalancer.git
 $ cd FedBalancer
-$ pip install -r requirements.txt
+$ pip install torch
+$ pip install timeout_decotrator
+```
+
+### Installing GLIBCXX_3.4.29 (only on Ubuntu)
+
+```
+$ sudo add-apt-repository ppa:ubuntu-toolchain-r/test 
+$ sudo apt-get update
+$ sudo apt-get install gcc-4.9
+$ sudo apt-get upgrade libstdc++6
+$ sudo apt-get dist-upgrade
 ```
 
 ## Datasets
 
-We evaluated based on five datasets: ```FEMNIST```, ```Celeba```, ```Reddit```, ```Shakespeare```, ```UCI-HAR```.
+This repository contains experiment on a widely used dataset for FL benchmark, ```FEMNIST```.
 
 ## How to Run the Experiments
 
 ### Running the main experiment of the paper in Section 4.2 and 4.3 one by one
 
-1. Go to directory of respective dataset in `data/` for instructions on generating the benchmark dataset
+1. Go to directory of FEMNIST dataset in `data/femnist` for instructions on generating the benchmark dataset
 2. Run (please refer to the list of config files in the subdirectory with respective dataset name in ```configs/```, it contains all the config files for the experiment)
 ```
 $ cd models/
 
 # FedAvg + 1T experiment in Section 4.2 and 4.3 with random seed 0
-# candidate {dataset_name}: femnist/celeba/reddit/shakespeare/har
 
-$ python main.py --config=configs/{dataset_name}/{dataset_name}_fedavg_1T_seed0.cfg
-# example: python main.py --config=configs/har/har_fedavg_1T_seed0.cfg
+$ python main.py --config=configs/femnist/femnist_fedavg_1T_seed0.cfg
 
 # FedBalancer experiment in Section 4.2 and 4.3 with random seed 0
-# candidate {dataset_name}: femnist/celeba/reddit/shakespeare/har
 
-$ python main.py --config=configs/{dataset_name}/{dataset_name}_fedbalancer_seed0.cfg
-# example: python main.py --config=configs/har/har_fedbalancer_seed0.cfg
+$ python main.py --config=configs/femnist/femnist_fedbalancer_seed0.cfg
 ```
 
 Add ```CUDA_VISIBLE_DEVICES={GPU_ID} ``` before the command to run the experiment on the specific GPUs. If you set ```GPU_ID``` as ```-1```, the experiment runs on cpus.
 
 Note that you could change the parameters of fedbalancer config file to test another parameters. 
-
-### Running the experiments at ONCE
-
-1. Go to directory of respective dataset in `data/` for instructions on generating the benchmark dataset
-2. Configure your python file (IMPORTANT NOTE: before you run the experiment, please refer to the python file that runs all the experiments in `paper_experiments`. You need to assign which GPU you will assign at each experiment, and you may need to run experiments partially as running all the experiments may exceed the VRAM of your GPU; check the available RAM if you are running the experiments on CPU.)
-3. Run
-```
-$ cd models/
-
-# Run baseline experiments
-$ python ../paper_experiments/experiment_run_{dataset_name}_baselines.py
-
-# Run fedbalancer experiments
-$ python ../paper_experiments/experiment_run_{dataset_name}_fedbalancer.py
-
-# TO RUN WITH CPU: Run baseline experiments
-$ python ../paper_experiments/experiment_run_{dataset_name}_baselines_cpu.py
-
-# TO RUN WITH CPU: Run fedbalancer experiments
-$ python ../paper_experiments/experiment_run_{dataset_name}_fedbalancer_cpu.py
-```
 
 <h3 id="config">Config File</h3>
 To simplify the command line arguments, we move most of the parameters to a <span id="jump">config file</span>. Below is a detailed example.
@@ -116,7 +102,7 @@ behav_hete False # bool, whether to simulate state(behavior) heterogeneity -> fi
 hard_hete False # bool, whether to simulate hardware heterogeneity, which contains differential on-device training time and network speed -> fixed to True in our experiments
 
 ## ML related configurations
-dataset har # dataset to use
+dataset femnist # dataset to use
 model lr # file that defines the model (in this example, it is LogisticRegression)
 learning_rate 0.0003 # learning-rate of LR
 batch_size 10 # batch-size for training 
@@ -187,7 +173,7 @@ noise_factor 0.5 # noise factor for differential privacy of FedBalancer
 # oortbalancer # this option allows us to perform OortBalancer as described in Section 3.4. This should not be used with fedbalancer True option.
 ```
 
-## How to Parse the Results After the Experiment
+## How to Parse the Results After the Experiment (NEED TO BE UPDATED)
 - Please refer to the jupyter notebook ipynb scripts in ```results_parsing```
 - Current repository contains jupyter notebook for ```UCI-HAR``` dataset as an example.
 
