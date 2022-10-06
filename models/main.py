@@ -148,19 +148,6 @@ def main():
     
     for i in range(num_rounds):
         logger.info('===================== Round {} of {} ====================='.format(i+1, num_rounds))
-        
-        # oort pacer updates the deadline based on the utility of past rounds
-        if cfg.oort_pacer:
-            if server.current_round > server.pacer_window * 2:
-                if sum(server.round_exploited_utility[-(2*server.pacer_window):-(server.pacer_window)]) > sum(server.round_exploited_utility[-(server.pacer_window):]):
-                    logger.info('by oort pacer, the deadline is changed from {} to {}'.format(server.deadline, server.deadline+cfg.oort_pacer_delta))
-                    server.deadline += cfg.oort_pacer_delta
-        else:
-            if server.current_round > server.pacer_window * 2:
-                if sum(server.round_exploited_utility[-(2*server.pacer_window):-(server.pacer_window)]) > sum(server.round_exploited_utility[-(server.pacer_window):]):
-                    logger.info('by oort, the oort_non_pacer_deadline is changed from {} to {}'.format(server.oort_non_pacer_deadline, server.oort_non_pacer_deadline+10))
-                    server.deadline += 10
-
         # 1. selection stage
         logger.info('--------------------- selection stage ---------------------')
         # 1.1 select clients
@@ -184,7 +171,7 @@ def main():
         online_clients = online(train_clients, cur_time, time_window)
 
         # Select subset of clients to train at this round
-        if not server.select_clients(i, 
+        if not server.select_clients(
                               online_clients, 
                               num_clients=clients_per_round,
                               batch_size=cfg.batch_size):
@@ -205,10 +192,10 @@ def main():
         # 2. configuration stage
         logger.info('--------------------- configuration stage ---------------------')
         # 2.1 train(no parallel implementation)
-        sys_metrics = server.train_model(num_epochs=cfg.num_epochs, batch_size=cfg.batch_size, minibatch=cfg.minibatch)
+        simulation_time = server.train_model(num_epochs=cfg.num_epochs, batch_size=cfg.batch_size)
         
         # 2.2 update simulation time
-        server.pass_time(sys_metrics['configuration_time'])
+        server.pass_time(simulation_time)
         
         # 3. update stage
         logger.info('--------------------- report stage ---------------------')

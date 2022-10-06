@@ -39,10 +39,12 @@ class ClientModel(Model):
         correct = pred.eq(labels.view_as(pred)).sum().item()
         # print("HAHA")
         # print(self.losses(output, labels), self.losses(output, labels).mean(), torch.mean(self.losses(output, labels)))
-        loss = self.losses(output, labels).mean().item()
+        loss_list = self.losses(output, labels)
+        loss = loss_list.mean().item()
+        loss_list = [t.item() for t in loss_list]
         self.net = self.net.to("cpu")
 
-        return {ACCURACY_KEY: correct/len(data['x']), "loss": loss}
+        return {ACCURACY_KEY: correct/len(data['x']), "loss": loss, "loss_list": loss_list}
 
     def process_x(self, raw_x_batch):
         return torch.from_numpy(raw_x_batch)

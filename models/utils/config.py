@@ -36,14 +36,10 @@ class Config():
         self.hard_hete = False
 
         self.no_training = False
-        self.real_world = False
         # grad_compress,  structure_k, fedprox and qffl are mutually-exclusive
         self.compress_algo = None
         self.fedprox = False
         self.fedprox_mu = 0
-        self.structure_k = None 
-        self.qffl = False
-        self.qffl_q = 0
         
         self.fedbalancer = False
         self.fb_w = 1
@@ -54,8 +50,6 @@ class Config():
 
         self.noise_factor = 0.0
 
-        self.fb_simple_control_lt = False
-        self.fb_simple_control_ddl = False
         self.fb_simple_control_lt_stepsize = 0
         self.fb_simple_control_ddl_stepsize = 0
 
@@ -135,26 +129,12 @@ class Config():
                         self.hard_hete = line[1].strip() == 'True'
                         if not self.hard_hete:
                             logger.info('no hardware heterogeneity! assume all clients are same.')
-                    elif line[0] == 'no_training' :
-                        self.no_training = line[1].strip() == 'True'
-                        if self.no_training:
-                            logger.info('no actual training process')
-                    elif line[0] == 'realworld':
-                        self.real_world = line[1].strip() == 'True'
                     elif line[0] == 'max_sample' :
                         self.max_sample = int(line[1])
-                    elif line[0] == 'compress_algo':
-                        self.compress_algo = line[1].strip()
                     elif line[0] == 'fedprox':
                         self.fedprox = line[1].strip()=='True'
                     elif line[0] == 'fedprox_mu':
                         self.fedprox_mu = float(line[1].strip())
-                    elif line[0] == 'structure_k':
-                        self.structure_k = int(line[1].strip())
-                    elif line[0] == 'qffl':
-                        self.qffl = line[1].strip()=='True'
-                    elif line[0] == 'qffl_q':
-                        self.qffl_q = float(line[1].strip())
                     elif line[0] == 'user_trace':
                         # to be compatibale with old version
                         self.user_trace = line[1].strip()=='True'
@@ -208,9 +188,6 @@ class Config():
                         self.ss_baseline = line[1].strip()=='True'
                 except Exception as e:
                     traceback.print_exc()
-        if self.real_world and 'realworld' not in self.dataset:
-            logger.error('\'real_world\' is valid only when dataset is set to \'realworld\', current dataset {}'.format(self.dataset))
-            self.real_world = False
         if self.user_trace == True:
             self.hard_hete = True
             self.behav_hete = True

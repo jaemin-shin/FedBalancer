@@ -4,7 +4,9 @@
 # from tensorflow.python.framework import ops
 # from tensorflow.python.training import optimizer
 # import tensorflow as tf
+import torch
 
+#TODO: NEED TO REFINE THIS INTO PYTORCH VERSION; CURRENTLY UNAVAILABLE
 
 class PerturbedGradientDescent(optimizer.Optimizer):
     """Implementation of Perturbed Gradient Descent, i.e., FedProx optimizer"""

@@ -1,0 +1,187 @@
+2022-10-07 00:41:04,061 - FL-type - INFO - logger init finished ---- log file: configs/femnist/femnist_oort_seed0.cfg.log
+2022-10-07 00:41:04,269 - FL-type - INFO - read config from configs/femnist/femnist_oort_seed0.cfg
+2022-10-07 00:41:04,269 - FL-type - INFO - no behavior heterogeneity! assume client is availiable at any time.
+2022-10-07 00:41:04,269 - FL-type - INFO - ================= Config =================
+2022-10-07 00:41:04,269 - FL-type - INFO - 	config_name = configs/femnist/femnist_oort_seed0.cfg
+2022-10-07 00:41:04,269 - FL-type - INFO - 	dataset = femnist
+2022-10-07 00:41:04,269 - FL-type - INFO - 	model = cnn
+2022-10-07 00:41:04,269 - FL-type - INFO - 	num_rounds = 6000
+2022-10-07 00:41:04,269 - FL-type - INFO - 	lr = 0.001
+2022-10-07 00:41:04,269 - FL-type - INFO - 	eval_every = 5
+2022-10-07 00:41:04,269 - FL-type - INFO - 	clients_per_round = 100
+2022-10-07 00:41:04,269 - FL-type - INFO - 	min_selected = 1
+2022-10-07 00:41:04,270 - FL-type - INFO - 	max_sample = 2147483647
+2022-10-07 00:41:04,270 - FL-type - INFO - 	batch_size = 10
+2022-10-07 00:41:04,270 - FL-type - INFO - 	seed = 0
+2022-10-07 00:41:04,270 - FL-type - INFO - 	num_epochs = 5
+2022-10-07 00:41:04,270 - FL-type - INFO - 	minibatch = None
+2022-10-07 00:41:04,270 - FL-type - INFO - 	round_ddl = 1000
+2022-10-07 00:41:04,270 - FL-type - INFO - 	update_frac = 0.01
+2022-10-07 00:41:04,270 - FL-type - INFO - 	max_client_num = 9223372036854775807
+2022-10-07 00:41:04,270 - FL-type - INFO - 	aggregate_algorithm = SucFedAvg
+2022-10-07 00:41:04,270 - FL-type - INFO - 	time_window = [20.0, 0.0]
+2022-10-07 00:41:04,270 - FL-type - INFO - 	user_trace = False
+2022-10-07 00:41:04,270 - FL-type - INFO - 	behav_hete = False
+2022-10-07 00:41:04,270 - FL-type - INFO - 	hard_hete = True
+2022-10-07 00:41:04,270 - FL-type - INFO - 	no_training = False
+2022-10-07 00:41:04,270 - FL-type - INFO - 	compress_algo = None
+2022-10-07 00:41:04,270 - FL-type - INFO - 	fedprox = False
+2022-10-07 00:41:04,271 - FL-type - INFO - 	fedprox_mu = 0
+2022-10-07 00:41:04,271 - FL-type - INFO - 	fedbalancer = False
+2022-10-07 00:41:04,271 - FL-type - INFO - 	fb_w = 1
+2022-10-07 00:41:04,271 - FL-type - INFO - 	fb_p = 0.0
+2022-10-07 00:41:04,271 - FL-type - INFO - 	fb_inference_pipelining = False
+2022-10-07 00:41:04,271 - FL-type - INFO - 	noise_factor = 0.0
+2022-10-07 00:41:04,271 - FL-type - INFO - 	fb_simple_control_lt_stepsize = 0
+2022-10-07 00:41:04,271 - FL-type - INFO - 	fb_simple_control_ddl_stepsize = 0
+2022-10-07 00:41:04,271 - FL-type - INFO - 	fb_client_selection = False
+2022-10-07 00:41:04,271 - FL-type - INFO - 	oort_pacer = True
+2022-10-07 00:41:04,271 - FL-type - INFO - 	oort_pacer_delta = 10
+2022-10-07 00:41:04,271 - FL-type - INFO - 	oort_blacklist = False
+2022-10-07 00:41:04,271 - FL-type - INFO - 	oort_blacklist_rounds = 10
+2022-10-07 00:41:04,271 - FL-type - INFO - 	oort = True
+2022-10-07 00:41:04,271 - FL-type - INFO - 	oortbalancer = False
+2022-10-07 00:41:04,271 - FL-type - INFO - 	ddl_baseline_smartpc = False
+2022-10-07 00:41:04,272 - FL-type - INFO - 	ddl_baseline_smartpc_percentage = 0.0
+2022-10-07 00:41:04,272 - FL-type - INFO - 	ddl_baseline_fixed = False
+2022-10-07 00:41:04,272 - FL-type - INFO - 	ddl_baseline_fixed_value_multiplied_at_mean = 0.0
+2022-10-07 00:41:04,272 - FL-type - INFO - 	global_final_time = 300000
+2022-10-07 00:41:04,272 - FL-type - INFO - 	global_final_test_accuracy = 0.0
+2022-10-07 00:41:04,272 - FL-type - INFO - 	output_path = ../models/configs/femnist/
+2022-10-07 00:41:04,272 - FL-type - INFO - 	ss_baseline = False
+2022-10-07 00:41:04,272 - FL-type - INFO - ================= ====== =================
+2022-10-07 00:41:04,272 - FL-type - INFO - ############################## femnist.client_model ##############################
+2022-10-07 00:41:04,517 - FL-type - INFO - model size: 26310776
+2022-10-07 00:41:04,518 - FL-type - INFO - ======================Setup Clients==========================
+2022-10-07 00:41:26,484 - FL-type - INFO - Train Clients in Total: 641
+2022-10-07 00:41:26,484 - FL-type - INFO - Test Clients in Total: 72
+2022-10-07 00:41:26,495 - FL-type - INFO - set up 10 clients
+2022-10-07 00:41:26,497 - FL-type - INFO - set up 20 clients
+2022-10-07 00:41:26,498 - FL-type - INFO - set up 30 clients
+2022-10-07 00:41:26,571 - FL-type - INFO - set up 40 clients
+2022-10-07 00:41:26,573 - FL-type - INFO - set up 50 clients
+2022-10-07 00:41:26,575 - FL-type - INFO - set up 60 clients
+2022-10-07 00:41:26,577 - FL-type - INFO - set up 70 clients
+2022-10-07 00:41:26,579 - FL-type - INFO - set up 80 clients
+2022-10-07 00:41:26,581 - FL-type - INFO - set up 90 clients
+2022-10-07 00:41:26,583 - FL-type - INFO - set up 100 clients
+2022-10-07 00:41:26,585 - FL-type - INFO - set up 110 clients
+2022-10-07 00:41:26,587 - FL-type - INFO - set up 120 clients
+2022-10-07 00:41:26,589 - FL-type - INFO - set up 130 clients
+2022-10-07 00:41:26,591 - FL-type - INFO - set up 140 clients
+2022-10-07 00:41:26,593 - FL-type - INFO - set up 150 clients
+2022-10-07 00:41:26,595 - FL-type - INFO - set up 160 clients
+2022-10-07 00:41:26,597 - FL-type - INFO - set up 170 clients
+2022-10-07 00:41:26,599 - FL-type - INFO - set up 180 clients
+2022-10-07 00:41:26,601 - FL-type - INFO - set up 190 clients
+2022-10-07 00:41:26,603 - FL-type - INFO - set up 200 clients
+2022-10-07 00:41:26,605 - FL-type - INFO - set up 210 clients
+2022-10-07 00:41:26,607 - FL-type - INFO - set up 220 clients
+2022-10-07 00:41:26,609 - FL-type - INFO - set up 230 clients
+2022-10-07 00:41:26,611 - FL-type - INFO - set up 240 clients
+2022-10-07 00:41:26,613 - FL-type - INFO - set up 250 clients
+2022-10-07 00:41:26,615 - FL-type - INFO - set up 260 clients
+2022-10-07 00:41:26,617 - FL-type - INFO - set up 270 clients
+2022-10-07 00:41:26,619 - FL-type - INFO - set up 280 clients
+2022-10-07 00:41:26,621 - FL-type - INFO - set up 290 clients
+2022-10-07 00:41:26,623 - FL-type - INFO - set up 300 clients
+2022-10-07 00:41:26,625 - FL-type - INFO - set up 310 clients
+2022-10-07 00:41:26,627 - FL-type - INFO - set up 320 clients
+2022-10-07 00:41:26,628 - FL-type - INFO - set up 330 clients
+2022-10-07 00:41:26,630 - FL-type - INFO - set up 340 clients
+2022-10-07 00:41:26,632 - FL-type - INFO - set up 350 clients
+2022-10-07 00:41:26,634 - FL-type - INFO - set up 360 clients
+2022-10-07 00:41:26,635 - FL-type - INFO - set up 370 clients
+2022-10-07 00:41:26,637 - FL-type - INFO - set up 380 clients
+2022-10-07 00:41:26,639 - FL-type - INFO - set up 390 clients
+2022-10-07 00:41:26,641 - FL-type - INFO - set up 400 clients
+2022-10-07 00:41:26,643 - FL-type - INFO - set up 410 clients
+2022-10-07 00:41:26,644 - FL-type - INFO - set up 420 clients
+2022-10-07 00:41:26,646 - FL-type - INFO - set up 430 clients
+2022-10-07 00:41:26,648 - FL-type - INFO - set up 440 clients
+2022-10-07 00:41:26,650 - FL-type - INFO - set up 450 clients
+2022-10-07 00:41:26,651 - FL-type - INFO - set up 460 clients
+2022-10-07 00:41:26,653 - FL-type - INFO - set up 470 clients
+2022-10-07 00:41:26,655 - FL-type - INFO - set up 480 clients
+2022-10-07 00:41:26,657 - FL-type - INFO - set up 490 clients
+2022-10-07 00:41:26,658 - FL-type - INFO - set up 500 clients
+2022-10-07 00:41:26,660 - FL-type - INFO - set up 510 clients
+2022-10-07 00:41:26,666 - FL-type - INFO - set up 520 clients
+2022-10-07 00:41:26,669 - FL-type - INFO - set up 530 clients
+2022-10-07 00:41:26,670 - FL-type - INFO - set up 540 clients
+2022-10-07 00:41:26,671 - FL-type - INFO - set up 550 clients
+2022-10-07 00:41:26,673 - FL-type - INFO - set up 560 clients
+2022-10-07 00:41:26,674 - FL-type - INFO - set up 570 clients
+2022-10-07 00:41:26,676 - FL-type - INFO - set up 580 clients
+2022-10-07 00:41:26,677 - FL-type - INFO - set up 590 clients
+2022-10-07 00:41:26,678 - FL-type - INFO - set up 600 clients
+2022-10-07 00:41:26,680 - FL-type - INFO - set up 610 clients
+2022-10-07 00:41:26,681 - FL-type - INFO - set up 620 clients
+2022-10-07 00:41:26,683 - FL-type - INFO - set up 630 clients
+2022-10-07 00:41:26,684 - FL-type - INFO - set up 640 clients
+2022-10-07 00:41:27,391 - FL-type - INFO - Timer cached in cached_timers.json
+2022-10-07 00:41:27,393 - FL-type - INFO - device setup result: defaultdict(<class 'int'>, {'Xiaomi Redmi Note 7 Pro': 303, 'Google Nexus S': 333, 'Google Pixel 4': 5})
+2022-10-07 00:41:27,616 - FL-type - INFO - ===================== Random Initialization =====================
+2022-10-07 00:41:27,617 - FL-type - INFO - ===================== Round 1 of 6000 =====================
+2022-10-07 00:41:27,617 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:41:27,617 - FL-type - INFO - current time: 0	time window: 20.0	
+2022-10-07 00:41:27,618 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:41:27,621 - FL-type - INFO - selected num: 130
+2022-10-07 00:41:27,621 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:41:27,621 - FL-type - INFO - this round deadline 143
+2022-10-07 00:42:20,428 - FL-type - INFO - average acc: 0.11399999999999992, average loss: 4.036214797496796
+2022-10-07 00:42:20,428 - FL-type - INFO - configuration and update stage simulation time: 21.381164273745764
+2022-10-07 00:42:20,433 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:42:20,433 - FL-type - INFO - 100 of 130 clients upload successfully
+2022-10-07 00:42:20,433 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:42:20,433 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:42:22,085 - FL-type - INFO - ===================== Round 2 of 6000 =====================
+2022-10-07 00:42:22,085 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:42:22,085 - FL-type - INFO - current time: 41.38116427374577	time window: 20.0	
+2022-10-07 00:42:22,086 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:42:22,108 - FL-type - INFO - epsilon 0.9
+2022-10-07 00:42:22,109 - FL-type - INFO - selected num: 130
+2022-10-07 00:42:22,109 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:42:22,109 - FL-type - INFO - this round deadline 143
+2022-10-07 00:43:05,081 - FL-type - INFO - average acc: 0.11999999999999991, average loss: 3.971482973098755
+2022-10-07 00:43:05,082 - FL-type - INFO - configuration and update stage simulation time: 17.000593489079932
+2022-10-07 00:43:05,084 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:43:05,085 - FL-type - INFO - 100 of 130 clients upload successfully
+2022-10-07 00:43:05,085 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:43:05,085 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:43:06,471 - FL-type - INFO - ===================== Round 3 of 6000 =====================
+2022-10-07 00:43:06,471 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:43:06,471 - FL-type - INFO - current time: 78.3817577628257	time window: 20.0	
+2022-10-07 00:43:06,472 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:43:06,493 - FL-type - INFO - epsilon 0.882
+2022-10-07 00:43:06,494 - FL-type - INFO - selected num: 130
+2022-10-07 00:43:06,494 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:43:06,495 - FL-type - INFO - this round deadline 143
+2022-10-07 00:43:48,465 - FL-type - INFO - average acc: 0.09722222222222215, average loss: 3.889758424758911
+2022-10-07 00:43:48,466 - FL-type - INFO - configuration and update stage simulation time: 18.770758162679027
+2022-10-07 00:43:48,469 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:43:48,469 - FL-type - INFO - 100 of 130 clients upload successfully
+2022-10-07 00:43:48,469 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:43:48,469 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:43:48,954 - FL-type - INFO - ===================== Round 4 of 6000 =====================
+2022-10-07 00:43:48,954 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:43:48,954 - FL-type - INFO - current time: 117.15251592550473	time window: 20.0	
+2022-10-07 00:43:48,955 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:43:48,976 - FL-type - INFO - epsilon 0.86436
+2022-10-07 00:43:48,976 - FL-type - INFO - selected num: 130
+2022-10-07 00:43:48,977 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:43:48,977 - FL-type - INFO - this round deadline 143
+2022-10-07 00:44:39,395 - FL-type - INFO - average acc: 0.09422222222222212, average loss: 3.760414807796478
+2022-10-07 00:44:39,395 - FL-type - INFO - configuration and update stage simulation time: 33.00835884397477
+2022-10-07 00:44:39,400 - FL-type - INFO - --------------------- report stage ---------------------
+2022-10-07 00:44:39,400 - FL-type - INFO - 100 of 130 clients upload successfully
+2022-10-07 00:44:39,400 - FL-type - INFO - round succeed, updating global model...
+2022-10-07 00:44:39,400 - FL-type - INFO - Aggragate with SucFedAvg
+2022-10-07 00:44:40,041 - FL-type - INFO - ===================== Round 5 of 6000 =====================
+2022-10-07 00:44:40,042 - FL-type - INFO - --------------------- selection stage ---------------------
+2022-10-07 00:44:40,042 - FL-type - INFO - current time: 170.1608747694795	time window: 20.0	
+2022-10-07 00:44:40,043 - FL-type - INFO - 641 of 641 clients online
+2022-10-07 00:44:40,065 - FL-type - INFO - epsilon 0.8470728
+2022-10-07 00:44:40,065 - FL-type - INFO - selected num: 130
+2022-10-07 00:44:40,066 - FL-type - INFO - --------------------- configuration stage ---------------------
+2022-10-07 00:44:40,066 - FL-type - INFO - this round deadline 143
