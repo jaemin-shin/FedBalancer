@@ -173,9 +173,8 @@ noise_factor 0.5 # noise factor for differential privacy of FedBalancer
 # oortbalancer # this option allows us to perform OortBalancer as described in Section 3.4. This should not be used with fedbalancer True option.
 ```
 
-## How to Parse the Results After the Experiment (NEED TO BE UPDATED)
+## How to Parse the Results After the Experiment
 - Please refer to the jupyter notebook ipynb scripts in ```results_parsing```
-- Current repository contains jupyter notebook for ```UCI-HAR``` dataset as an example.
 
 ## Notes
 
