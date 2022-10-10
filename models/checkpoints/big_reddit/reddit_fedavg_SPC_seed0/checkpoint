@@ -1,2 +1,0 @@
-model_checkpoint_path: "reddit_fedavg_SPC_seed0.ckpt"
-all_model_checkpoint_paths: "reddit_fedavg_SPC_seed0.ckpt"

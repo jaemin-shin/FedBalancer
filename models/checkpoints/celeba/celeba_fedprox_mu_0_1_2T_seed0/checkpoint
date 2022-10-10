@@ -1,2 +1,0 @@
-model_checkpoint_path: "celeba_fedprox_mu_0_1_2T_seed0.ckpt"
-all_model_checkpoint_paths: "celeba_fedprox_mu_0_1_2T_seed0.ckpt"

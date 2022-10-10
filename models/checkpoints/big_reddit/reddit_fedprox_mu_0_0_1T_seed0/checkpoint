@@ -1,2 +1,0 @@
-model_checkpoint_path: "reddit_fedprox_mu_0_0_1T_seed0.ckpt"
-all_model_checkpoint_paths: "reddit_fedprox_mu_0_0_1T_seed0.ckpt"

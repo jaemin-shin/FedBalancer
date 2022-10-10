@@ -19,8 +19,4 @@ models/grad_compress/temp/*
 _build/
 _templates/
 
-data/har/data/*
-data/celeba/data/*
 data/femnist/data/*
-data/big_reddit/data/*
-data/shakespeare/data/*

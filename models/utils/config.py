@@ -12,7 +12,7 @@ DEFAULT_CONFIG_FILE = 'default.cfg'
 class Config():
     def __init__(self, config_file = 'default.cfg'):
         self.config_name = config_file
-        self.dataset = 'reddit'
+        self.dataset = 'femnist'
         self.model = 'stacked_lstm'
         self.num_rounds = -1            # -1 for unlimited
         self.lr = 0.1

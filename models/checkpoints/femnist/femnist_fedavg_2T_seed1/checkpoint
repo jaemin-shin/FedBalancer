@@ -1,2 +1,0 @@
-model_checkpoint_path: "femnist_fedavg_2T_seed1.ckpt"
-all_model_checkpoint_paths: "femnist_fedavg_2T_seed1.ckpt"
