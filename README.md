@@ -54,7 +54,7 @@ $ conda activate fb-torch-conda
 $ git clone https://github.com/jaemin-shin/FedBalancer.git
 $ cd FedBalancer
 $ pip install torch
-$ pip install timeout_decotrator
+$ pip install timeout_decorator
 ```
 
 ### Installing GLIBCXX_3.4.29 (only on Ubuntu)
