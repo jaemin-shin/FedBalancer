@@ -37,6 +37,8 @@ $ conda update --all
 ### Setup a conda env and install pip inside conda env
 
 ```
+$ git clone https://github.com/jaemin-shin/FedBalancer.git
+$ cd FedBalancer
 $ conda env create -f environment.yml --name fb-torch-conda
 $ conda activate fb-torch-conda
 $ conda install pip
@@ -51,8 +53,6 @@ $ conda activate fb-torch-conda
 ### Install other dependencies
 
 ```
-$ git clone https://github.com/jaemin-shin/FedBalancer.git
-$ cd FedBalancer
 $ pip install torch
 $ pip install timeout_decorator
 ```
