@@ -55,6 +55,7 @@ $ conda activate fb-torch-conda
 ```
 $ pip install torch
 $ pip install timeout_decorator
+$ pip install matplotlib
 ```
 
 ### Installing GLIBCXX_3.4.29 (only on Ubuntu)
