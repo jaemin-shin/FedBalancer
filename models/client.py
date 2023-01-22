@@ -53,7 +53,6 @@ class Client:
         self.per_batch_train_times = []
 
         self.trained_num_of_samples = []
-        self.uniquely_seen_num_of_samples = []
         
         self.device = device  # if device == none, it will use real time as train time, and set upload/download time as 0
         if self.device == None:
@@ -96,31 +95,24 @@ class Client:
             else:
                 num_train_samples = 1
             for per_batch_train_time in curr_per_batch_train_times:
-                if self.cfg.oortbalancer:
+                if self.cfg.oortbalancer or self.cfg.oort:
                     self.per_epoch_train_times.append(per_batch_train_time)
                     self.per_batch_train_times.append(per_batch_train_time)
                     
-                    if num_train_samples > self.cfg.num_epochs * self.cfg.batch_size:
-                        self.uniquely_seen_num_of_samples.append(self.cfg.num_epochs * self.cfg.batch_size)
-                    elif num_train_samples > self.cfg.batch_size:
-                        self.uniquely_seen_num_of_samples.append((num_train_samples // self.cfg.batch_size) * self.cfg.batch_size)
-                    else:
-                        self.uniquely_seen_num_of_samples.append(num_train_samples)
-                    
                     self.trained_num_of_samples.append(self.cfg.batch_size)
-
-                    self.inference_times.append(((num_train_samples-1)//self.cfg.batch_size + 1) * per_batch_train_time * 0.5)
-                    self.inference_times_per_sample.append(self.inference_times[-1]/num_train_samples)
+                    if self.cfg.oortbalancer:
+                        self.inference_times.append(((num_train_samples-1)//self.cfg.batch_size + 1) * per_batch_train_time * 0.5)
+                        self.inference_times_per_sample.append(self.inference_times[-1]/num_train_samples)
                 else:
                     self.per_epoch_train_times.append(((num_train_samples-1)//self.cfg.batch_size + 1) * per_batch_train_time)
                     self.per_batch_train_times.append(per_batch_train_time)
 
                     self.trained_num_of_samples.append(num_train_samples)
-                    self.uniquely_seen_num_of_samples.append(num_train_samples)
-                    
-                    # Inference times are calculated as half of the epoch train times
-                    self.inference_times.append(self.per_epoch_train_times[-1]*0.5)
-                    self.inference_times_per_sample.append(self.inference_times[-1]/num_train_samples)
+                
+                    if self.cfg.fedbalancer:
+                        # Inference times are calculated as half of the epoch train times
+                        self.inference_times.append(self.per_epoch_train_times[-1]*0.5)
+                        self.inference_times_per_sample.append(self.inference_times[-1]/num_train_samples)
         else:
             curr_per_batch_train_times = self.device.set_device_model("Redmi Note 8", self.id)
             for per_batch_train_time in curr_per_batch_train_times:
@@ -134,7 +126,6 @@ class Client:
                 self.per_batch_train_times.append(per_batch_train_time)
 
                 self.trained_num_of_samples.append(num_train_samples)
-                self.uniquely_seen_num_of_samples.append(num_train_samples)
                 
                 self.inference_times.append(self.per_epoch_train_times[-1]*0.5)
                 self.inference_times_per_sample.append(self.inference_times[-1]/num_train_samples)
@@ -167,7 +158,6 @@ class Client:
         
         def train_with_simulate_time(self, start_t, num_epochs=1, batch_size=10):
 
-            uniquely_seen_data_cnt = []
             ne=-1
 
             num_data = min(len(self.train_data["x"]), self.cfg.max_sample)
@@ -177,16 +167,15 @@ class Client:
                 # if cfg.fb_inference_pipelining is True, it means that FedBalancer is not doing a full pass on the client's data 
                 # except when a client is first selected for a round...
                 # otherwise, FedBalancer do full pass on the client's data at the start of training at a round
-                if self.is_first_round:
+                if self.is_first_round or (not self.cfg.fb_inference_pipelining):
                     self.whole_data_loss_list = self.fedbalancer.calculate_loss_on_whole_dataset_with_inference(self.train_data, self.model)
-
 
             # Sample selection on a client at a FL round with loss_threshold
             if self.cfg.fedbalancer:
                 selected_data, num_data, data_idx, self.sorted_loss = self.fedbalancer.fb_sample_selection(num_data, self.loss_threshold, self.whole_data_loss_list, self.train_data, self.deadline, self.train_time_per_batch_list, num_epochs, batch_size)
             # Oortbalancer sample selection
             elif self.cfg.oortbalancer:
-                selected_data, xss, yss, num_data, data_idx, self.sorted_loss, uniquely_seen_data_cnt = self.fedbalancer.fb_oortbalancer_sample_selection(batch_size, self.loss_threshold, self.whole_data_loss_list, self.train_data, self.deadline, self.train_time_per_batch_list, num_epochs, self.model)
+                selected_data, xss, yss, num_data, data_idx, self.sorted_loss = self.fedbalancer.fb_oortbalancer_sample_selection(batch_size, self.loss_threshold, self.whole_data_loss_list, self.train_data, self.deadline, self.train_time_per_batch_list, num_epochs, self.model)
             # Oort randomly selects a batch per epoch for training at this round
             # Oort selects same samples multiple times if the client has less data than batch_size * num_epoch
             elif self.cfg.oort:
@@ -195,7 +184,7 @@ class Client:
                 data_len = self.select_sample_num
                 tmp_data = zip(self.train_data["x"], self.train_data["y"])
                 tmp_data = zip(tmp_data, range(len(self.train_data["x"])))
-                tmp_data = zip(whole_data_loss_list, tmp_data)
+                tmp_data = zip(self.whole_data_loss_list, tmp_data)
                 tmp_data = sorted(tmp_data, reverse=True, key=lambda elem: elem[0])
 
                 tmp_data_pkg = [x for _,x in tmp_data[:data_len]]
@@ -215,9 +204,11 @@ class Client:
                 selected_data = {"x": self.preprocess_data_x(selected_data["x"]),
                                 "y": self.preprocess_data_y(selected_data["y"])}
             
+            
             data = selected_data
             
             train_time, train_time_per_batch, train_time_per_epoch = self.device.get_train_time_and_train_time_per_batch_and_train_time_per_epoch(num_data, batch_size, num_epochs)
+            # print(num_data, train_time, train_time_per_batch, train_time_per_epoch)
             self.train_time_per_batch_list.append(train_time_per_batch)
 
             logger.debug('client {}: num data:{}'.format(self.id, num_data))
@@ -253,7 +244,7 @@ class Client:
                 self.is_first_round = False
 
             download_time = self.device.get_download_time()
-            upload_time = self.device.get_upload_time(self.model.size) # will be re-calculated after training
+            upload_time = self.device.get_upload_time() # will be re-calculated after training
 
             self.act_inference_time = 0
             self.ori_inference_time = 0
@@ -342,14 +333,14 @@ class Client:
                                 update, acc, loss, = -1,-1,-1
                             elif self.cfg.fedprox and ne != -1:
                                 if self.cfg.oort or self.cfg.oortbalancer:
-                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, ne, batch_size)
+                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, ne, batch_size, self.cfg.oortbalancer)
                                 else:
                                     update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, ne, batch_size)
                                 train_time *= ne / num_epochs
                                 logger.debug("client {} train-epochs={}".format(self.id, ne))
                             elif (self.cfg.fedbalancer or self.cfg.oortbalancer) and ne != -1:
                                 if self.cfg.oort or self.cfg.oortbalancer:
-                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, ne, batch_size)
+                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, ne, batch_size, self.cfg.oortbalancer)
                                 else:
                                     update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, ne, batch_size)
                                 train_time *= ne / num_epochs
@@ -360,14 +351,7 @@ class Client:
                                 #self.download_times.append(download_time)
                                 if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                                     self.inference_times.append(inference_time)
-                                    if not self.cfg.oortbalancer:
-                                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                    else:
-                                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                if not self.cfg.oortbalancer:
-                                    self.uniquely_seen_num_of_samples.append(len(data['x']))
-                                else:
-                                    self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
                                 raise timeout_decorator.timeout_decorator.TimeoutError(failed_reason)
                         else:
                             failed_reason = 'failed when training'
@@ -375,14 +359,7 @@ class Client:
                             #self.download_times.append(download_time)
                             if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                                 self.inference_times.append(inference_time)
-                                if not self.cfg.oortbalancer:
-                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                else:
-                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                            if not self.cfg.oortbalancer:
-                                self.uniquely_seen_num_of_samples.append(len(data['x']))
-                            else:
-                                self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                                self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
                             raise timeout_decorator.timeout_decorator.TimeoutError(failed_reason)
                     elif (up_end_time-start_t) > self.deadline:
                         if self.cfg.fedprox or self.cfg.fedbalancer or self.cfg.oortbalancer:
@@ -396,14 +373,14 @@ class Client:
                                 update, acc, loss, = -1,-1,-1
                             elif self.cfg.fedprox and ne != -1:
                                 if self.cfg.oort or self.cfg.oortbalancer:
-                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, ne, batch_size)
+                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, ne, batch_size, self.cfg.oortbalancer)
                                 else:
                                     update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, ne, batch_size)
                                 train_time *= ne / num_epochs
                                 logger.debug("client {} train-epochs={}".format(self.id, ne))
                             elif (self.cfg.fedbalancer or self.cfg.oortbalancer) and ne != -1:
                                 if self.cfg.oort or self.cfg.oortbalancer:
-                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, ne, batch_size)
+                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, ne, batch_size, self.cfg.oortbalancer)
                                 else:
                                     update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, ne, batch_size)
                                 train_time *= ne / num_epochs
@@ -413,14 +390,7 @@ class Client:
                                 #self.download_times.append(download_time)
                                 if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                                     self.inference_times.append(inference_time)
-                                    if not self.cfg.oortbalancer:
-                                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                    else:
-                                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                if not self.cfg.oortbalancer:
-                                    self.uniquely_seen_num_of_samples.append(len(data['x']))
-                                else:
-                                    self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
                                 self.per_epoch_train_times.append(train_time_per_epoch)
                                 self.per_batch_train_times.append(train_time_per_batch)
                                 if not self.cfg.oortbalancer:
@@ -432,14 +402,7 @@ class Client:
                             #self.download_times.append(download_time)
                             if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                                 self.inference_times.append(inference_time)
-                                if not self.cfg.oortbalancer:
-                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                else:
-                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                            if not self.cfg.oortbalancer:
-                                self.uniquely_seen_num_of_samples.append(len(data['x']))
-                            else:
-                                self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                                self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
                             self.per_epoch_train_times.append(train_time_per_epoch)
                             self.per_batch_train_times.append(train_time_per_batch)
                             if not self.cfg.oortbalancer:
@@ -451,7 +414,7 @@ class Client:
                             update, acc, loss = -1,-1,-1,-1,-1
                         else:
                             if self.cfg.oort or self.cfg.oortbalancer:
-                                update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, num_epochs, batch_size)
+                                update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, num_epochs, batch_size, self.cfg.oortbalancer)
                             else:
                                 update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, num_epochs, batch_size)
                             logger.debug("client {} train-epochs={}".format(self.id, num_epochs))
@@ -487,14 +450,14 @@ class Client:
                                 update, acc, loss = -1,-1,-1,-1,-1
                             elif self.cfg.fedprox and ne != -1:
                                 if self.cfg.oort:
-                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, ne, batch_size)
+                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, ne, batch_size, self.cfg.oortbalancer)
                                 else:
                                     update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, ne, batch_size)
                                 train_time *= ne / num_epochs
                                 logger.debug("client {} train-epochs={}".format(self.id, ne))
                             elif (self.cfg.fedbalancer or self.cfg.oortbalancer) and ne != -1:
                                 if self.cfg.oort:
-                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, ne, batch_size)
+                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, ne, batch_size, self.cfg.oortbalancer)
                                 else:
                                     update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, ne, batch_size)
                                 train_time *= ne / num_epochs
@@ -504,14 +467,7 @@ class Client:
                                 #self.download_times.append(download_time)
                                 if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                                     self.inference_times.append(inference_time)
-                                    if not self.cfg.oortbalancer:
-                                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                    else:
-                                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                if not self.cfg.oortbalancer:
-                                    self.uniquely_seen_num_of_samples.append(len(data['x']))
-                                else:
-                                    self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
                                 if (self.act_download_time + self.act_inference_time) > self.deadline:
                                     self.sorted_loss = []
                                 raise timeout_decorator.timeout_decorator.TimeoutError(failed_reason)
@@ -522,14 +478,7 @@ class Client:
                             #self.download_times.append(download_time)
                             if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                                 self.inference_times.append(inference_time)
-                                if not self.cfg.oortbalancer:
-                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                else:
-                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                            if not self.cfg.oortbalancer:
-                                self.uniquely_seen_num_of_samples.append(len(data['x']))
-                            else:
-                                self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                                self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
                             raise timeout_decorator.timeout_decorator.TimeoutError(failed_reason)
                     elif (up_end_time-start_t) > self.deadline:
                         if self.cfg.fedprox or self.cfg.fedbalancer or self.cfg.oortbalancer:
@@ -543,14 +492,14 @@ class Client:
                                 update, acc, loss = -1,-1,-1,-1,-1
                             elif self.cfg.fedprox and ne != -1:
                                 if self.cfg.oort or self.cfg.oortbalancer:
-                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, ne, batch_size)
+                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, ne, batch_size, self.cfg.oortbalancer)
                                 else:
                                     update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, ne, batch_size)
                                 train_time *= ne / num_epochs
                                 logger.debug("client {} train-epochs={}".format(self.id, ne))
                             elif (self.cfg.fedbalancer or self.cfg.oortbalancer) and ne != -1:
                                 if self.cfg.oort or self.cfg.oortbalancer:
-                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, ne, batch_size)
+                                    update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, ne, batch_size, self.cfg.oortbalancer)
                                 else:
                                     update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, ne, batch_size)
                                 train_time *= ne / num_epochs
@@ -562,14 +511,7 @@ class Client:
                                 #self.download_times.append(download_time)
                                 if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                                     self.inference_times.append(inference_time)
-                                    if not self.cfg.oortbalancer:
-                                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                    else:
-                                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                if not self.cfg.oortbalancer:
-                                    self.uniquely_seen_num_of_samples.append(len(data['x']))
-                                else:
-                                    self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
                                 self.per_epoch_train_times.append(train_time_per_epoch)
                                 self.per_batch_train_times.append(train_time_per_batch)
                                 if not self.cfg.oortbalancer:
@@ -582,25 +524,18 @@ class Client:
                             #self.download_times.append(download_time)
                             if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                                 self.inference_times.append(inference_time)
-                                if not self.cfg.oortbalancer:
-                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                                else:
-                                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                            if not self.cfg.oortbalancer:
-                                self.uniquely_seen_num_of_samples.append(len(data['x']))
-                            else:
-                                self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                                self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
                             self.per_epoch_train_times.append(train_time_per_epoch)
                             self.per_batch_train_times.append(train_time_per_batch)
                             if not self.cfg.oortbalancer:
                                 self.trained_num_of_samples.append(len(data['x']))
                             raise timeout_decorator.timeout_decorator.TimeoutError(failed_reason)
-                    else :
+                    else:
                         if self.cfg.no_training:
                             update, acc, loss = -1,-1,-1,-1,-1
                         else:
                             if self.cfg.oort or self.cfg.oortbalancer:
-                                update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, num_epochs, batch_size)
+                                update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, num_epochs, batch_size, self.cfg.oortbalancer)
                             else:
                                 update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, num_epochs, batch_size)
                             logger.debug("client {} train-epochs={}".format(self.id, num_epochs))
@@ -609,7 +544,7 @@ class Client:
                     update, acc, loss = -1,-1,-1,-1,-1
                 else:
                     if self.cfg.oort or self.cfg.oortbalancer:
-                        update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data, data_idx, xss, yss, num_epochs, batch_size)
+                        update, acc, loss, data_loss_list_and_idx = self.model.oorttrain(data_idx, xss, yss, num_epochs, batch_size, self.cfg.oortbalancer)
                     else:
                         update, acc, loss, data_loss_list_and_idx = self.model.train(data, data_idx, num_epochs, batch_size)
                     logger.debug("client {} train-epochs={}".format(self.id, num_epochs))
@@ -631,21 +566,14 @@ class Client:
                 self.act_train_time = self.act_train_time * ne / num_epochs
             
             total_cost = self.act_download_time + self.act_inference_time + self.act_train_time + self.act_upload_time
-
+            
             if total_cost > self.deadline and not (self.cfg.oort_pacer or self.cfg.ddl_baseline_smartpc):
                 # failed when uploading
                 failed_reason = 'failed when uploading'
                 # Note that, to simplify, we did not change the update_size here, actually the actual update size is less.
                 if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                     self.inference_times.append(inference_time)
-                    if not self.cfg.oortbalancer:
-                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                    else:
-                        self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                if not self.cfg.oortbalancer:
-                    self.uniquely_seen_num_of_samples.append(len(data['x']))
-                else:
-                    self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
                 self.per_epoch_train_times.append(train_time_per_epoch)
                 self.per_batch_train_times.append(train_time_per_batch)
                 if not self.cfg.oortbalancer:
@@ -657,14 +585,7 @@ class Client:
 
             if inference_time != 0 and not self.cfg.fb_inference_pipelining:
                 self.inference_times.append(inference_time)
-                if not self.cfg.oortbalancer:
-                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-                else:
-                    self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
-            if not self.cfg.oortbalancer:
-                self.uniquely_seen_num_of_samples.append(len(data['x']))
-            else:
-                self.uniquely_seen_num_of_samples.append(uniquely_seen_data_cnt)
+                self.inference_times_per_sample.append(self.inference_times[-1]/(user_whole_data_len))
             self.per_epoch_train_times.append(train_time_per_epoch)
             self.per_batch_train_times.append(train_time_per_batch)
             if not self.cfg.oortbalancer:

@@ -1,12 +1,14 @@
-# from tensorflow.python.ops import control_flow_ops
-# from tensorflow.python.ops import math_ops
-# from tensorflow.python.ops import state_ops
-# from tensorflow.python.framework import ops
-# from tensorflow.python.training import optimizer
-# import tensorflow as tf
-import torch
-
-#TODO: NEED TO REFINE THIS INTO PYTORCH VERSION; CURRENTLY UNAVAILABLE
+from tensorflow.python.ops import control_flow_ops
+from tensorflow.python.ops import math_ops
+from tensorflow.python.ops import state_ops
+from tensorflow.python.framework import ops
+from tensorflow.python.training import optimizer
+import tensorflow as tf
+# import torch
+ 
+# TODO: NEED TO REFINE THIS INTO PYTORCH VERSION; CURRENTLY UNAVAILABLE
+# HOWEVER, the best FedProx variable mu was 0 for FEMNIST, Reddit, Shakespeare, UCI-HAR, which are 4 out of 5 datasets used in FedBalancer paper
+# You could run FedProx without this PerturbedGradientDescent class, when mu == 0 :) Will fix this later
 
 class PerturbedGradientDescent(optimizer.Optimizer):
     """Implementation of Perturbed Gradient Descent, i.e., FedProx optimizer"""

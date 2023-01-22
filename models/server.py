@@ -32,6 +32,8 @@ class Server:
         self.clients_info = defaultdict(dict)
         self.test_clients_info = defaultdict(dict)
 
+        self.failed_clients = []
+
         self.current_round = 0
 
         self.oort = None
@@ -40,7 +42,7 @@ class Server:
         if self.cfg.oort or self.cfg.fb_client_selection or self.cfg.oortbalancer:
             self.oort = Oort(self.all_clients, deadline, oort_pacer = self.cfg.oort_pacer, pacer_delta = self.cfg.oort_pacer_delta, oort_blacklist = self.cfg.oort_blacklist)
         
-        if self.cfg.fedbalancer or self.cfg.oortbalancer:
+        if self.cfg.fedbalancer or self.cfg.oortbalancer or self.cfg.ss_baseline:
             self.fedbalancer = FedBalancer(self.cfg.fb_inference_pipelining, self.cfg.fb_p, self.cfg.fb_w, self.cfg.fb_simple_control_lt_stepsize, self.cfg.fb_simple_control_ddl_stepsize)
 
         for c in self.all_clients:
@@ -65,7 +67,6 @@ class Server:
             c.fedbalancer = self.fedbalancer
             c.oort = self.oort
 
-
     def select_clients(self, possible_clients, num_clients=20, batch_size=10):
         """Selects num_clients clients from possible_clients.
         
@@ -85,12 +86,13 @@ class Server:
         if num_clients < self.cfg.min_selected:
             logger.info('insufficient clients: need {} while get {} online'.format(self.cfg.min_selected, num_clients))
             return False
-        np.random.seed(self.current_round)
+        # np.random.seed(self.current_round)
 
         if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
-            self.deadline = self.oort.pacer_deadline_update(self.deadline, self.current_round)
+            if self.cfg.oort_pacer:
+                self.deadline = self.oort.pacer_deadline_update(self.deadline, self.current_round)
             self.selected_clients, self.clients_info = self.oort.select_clients(self.all_clients, possible_clients, num_clients, self.clients_info, self.current_round, self.deadline, self.cfg.batch_size, self.cfg.num_epochs,
-                                                                            self.cfg.behav_hete, self.cfg.fb_client_selection, self.cfg.fb_inference_pipelining)
+                                                                            self.cfg.behav_hete, self.cfg.fb_client_selection, self.cfg.fb_inference_pipelining, self.cfg.oortbalancer)
 
         # Randomly sample clients if Oort, Oortbalancer, or FedBalancer is not being used
         else:
@@ -135,7 +137,7 @@ class Server:
             self.fedbalancer.loss_threshold_selection()
 
             if self.cfg.fb_simple_control_ddl_stepsize != 0.0:
-                self.deadline = self.fedbalancer.deadline_selection(self.selected_clients, self.clients_info, self.cfg.num_epochs, self.deadline, self.cfg.batch_size)
+                self.deadline = self.fedbalancer.deadline_selection(self.selected_clients, self.clients_info, self.cfg.num_epochs, self.deadline, self.cfg.batch_size, self.current_round)
         
             logger.info('this round deadline {}, loss_threshold {}'.format(self.deadline, self.fedbalancer.loss_threshold))
             logger.info('this round deadline ratio {}, loss_threshold ratio {}'.format(self.fedbalancer.deadline_ratio, self.fedbalancer.loss_threshold_ratio))
@@ -178,6 +180,8 @@ class Server:
         server_current_model = copy.deepcopy(self.model)
         # for c in clients:
         #     c.model = copy.deepcopy(self.model)
+
+        round_failed_clients = []
         
         for c in self.selected_clients:
             c.model = None
@@ -280,31 +284,30 @@ class Server:
                     logger.debug('client {} upload successfully with acc {}, loss {}'.format(c.id,acc,loss))
             except timeout_decorator.timeout_decorator.TimeoutError as e:
                 logger.debug('client {} failed: {}'.format(c.id, e))
+                round_failed_clients.append(c.id)
                 
-                if self.cfg.fedbalancer or self.cfg.oortbalancer:
-                    simulate_time = self.deadline
-                    # in FedBalancer algorithm, this is done in client-side.
-                    # doing this here makes no difference in performance and privacy (because we do not use sample-level information other than calculating the overthreshold sum and count)
-                    # but we will patch this soon to move this to client
-                    if len(c.sorted_loss) != 0:
-                        # self.client_loss_count[str(c.id)] = len(c.sorted_loss)
-                        summ = 0
-                        overthreshold_loss_count = 0
+                # if self.cfg.fedbalancer or self.cfg.oortbalancer:
+                #     # in FedBalancer algorithm, this is done in client-side.
+                #     # doing this here makes no difference in performance and privacy (because we do not use sample-level information other than calculating the overthreshold sum and count)
+                #     # but we will patch this soon to move this to client
+                #     if len(c.sorted_loss) != 0:
+                #         # self.client_loss_count[str(c.id)] = len(c.sorted_loss)
+                #         summ = 0
+                #         overthreshold_loss_count = 0
 
-                        for loss_idx in range(len(c.sorted_loss)):
-                            if c.sorted_loss[len(c.sorted_loss)-1-loss_idx] > c.loss_threshold:
-                                summ += c.sorted_loss[len(c.sorted_loss)-1-loss_idx]*c.sorted_loss[len(c.sorted_loss)-1-loss_idx]
-                                overthreshold_loss_count += 1
-                        if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
-                            self.clients_info[str(c.id)]["overthreshold_loss_sum"] = summ
-                            self.clients_info[str(c.id)]["overthreshold_loss_count"] = overthreshold_loss_count
+                #         for loss_idx in range(len(c.sorted_loss)):
+                #             if c.sorted_loss[len(c.sorted_loss)-1-loss_idx] > c.loss_threshold:
+                #                 summ += c.sorted_loss[len(c.sorted_loss)-1-loss_idx]*c.sorted_loss[len(c.sorted_loss)-1-loss_idx]
+                #                 overthreshold_loss_count += 1
+                #         if self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer:
+                #             self.clients_info[str(c.id)]["overthreshold_loss_sum"] = summ
+                #             self.clients_info[str(c.id)]["overthreshold_loss_count"] = overthreshold_loss_count
                         
-                        noise1 = np.random.normal(0, self.cfg.noise_factor, 1)[0]
-                        noise2 = np.random.normal(0, self.cfg.noise_factor, 1)[0]
-                        self.fedbalancer.current_round_loss_min.append(np.min(c.sorted_loss)+noise1)
-                        self.fedbalancer.current_round_loss_max.append(np.percentile(c.sorted_loss, 80)+noise2)
-                else:
-                    simulate_time = self.deadline
+                #         noise1 = np.random.normal(0, self.cfg.noise_factor, 1)[0]
+                #         noise2 = np.random.normal(0, self.cfg.noise_factor, 1)[0]
+                #         self.fedbalancer.current_round_loss_min.append(np.min(c.sorted_loss)+noise1)
+                #         self.fedbalancer.current_round_loss_max.append(np.percentile(c.sorted_loss, 80)+noise2)
+                simulate_time = self.deadline
                 
                 if self.cfg.oort_pacer or self.cfg.ddl_baseline_smartpc:
                     assert(False)
@@ -320,6 +323,8 @@ class Server:
         # We sort the client round completion time, and aggregate the result of faster clients within the predefined number of succeeded clients in a round
         if self.cfg.oort_pacer or self.cfg.ddl_baseline_smartpc:
             client_simulate_times = sorted(client_simulate_times, key=lambda tup: tup[1])
+            # for i, client_simulate_time in enumerate(client_simulate_times):
+            #     print(i, client_simulate_time)
             for_loop_until = 0
             if self.cfg.oort_pacer:
                 for_loop_until = min(self.cfg.clients_per_round, len(client_simulate_times))
@@ -424,10 +429,25 @@ class Server:
             logger.error('failed reason: {}'.format(e))
             traceback.print_exc()
             assert False
-        
+
         # If everyone is at least once selected for a round, we set epsilon as zero, which is the exploration-exploitation parameter of Oort
-        if (self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer) and self.oort.epsilon != 0:
-            self.oort.zero_epsilon(self.all_clients, self.clients_info)
+        if (self.cfg.fb_client_selection or self.cfg.oort or self.cfg.oortbalancer):
+            
+            if len(self.failed_clients) != 0:
+                again_failed_clients = 0
+                for fc_id in self.failed_clients[-1]:
+                    for r_fc_id in round_failed_clients:
+                        if fc_id == r_fc_id:
+                            again_failed_clients += 1
+                logger.info("AGAIN FAILED CLIENTS:" + str(again_failed_clients))
+                if again_failed_clients > self.cfg.clients_per_round * 0.1:
+                    self.fedbalancer.guard_time += 10
+                else:
+                    self.fedbalancer.guard_time = 0
+            self.failed_clients.append(round_failed_clients)
+
+            if self.oort.epsilon != 0:
+                self.oort.zero_epsilon(self.all_clients, self.clients_info)
 
         return simulate_time
         
@@ -460,14 +480,12 @@ class Server:
                 # not supported aggregating algorithm
                 logger.error('not supported aggregating algorithm: {}'.format(self.cfg.aggregate_algorithm))
                 assert False
-            if self.fedbalancer != None:
-                self.fedbalancer.guard_time = 0
+            # if self.fedbalancer != None:
+            #     self.fedbalancer.guard_time = 0
         else:
             logger.info('round failed, global model maintained.')
             if self.fedbalancer != None:
                 self.fedbalancer.guard_time += 10
-            
-        
         self.updates = []
         
     def test_model(self, clients_to_test, set_to_use='test'):

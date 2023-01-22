@@ -26,13 +26,12 @@ class Oort:
         # Oort client selection variables
         self.epsilon = 0.9 # time-based exploration factor introduced in Oort, which decreases by a factor 0.98 after each round when it is larger than 0.2
 
-        self.system_utility_penalty_alpha = 0.5
+        self.system_utility_penalty_alpha = 8
         self.round_exploited_utility = []
 
         self.curr_round_exploited_utility = 0.0
 
         # This is a deadline only for client selection algorithm of Oort (Fan Lai et al., OSDI'21)
-        # TODO: REMOVE THIS
         self.oort_non_pacer_deadline = deadline
 
         if self.oort_pacer:
@@ -45,14 +44,8 @@ class Oort:
                 if sum(self.round_exploited_utility[-(2*self.pacer_window):-(self.pacer_window)]) > sum(self.round_exploited_utility[-(self.pacer_window):]):
                     logger.info('by oort pacer, the deadline is changed from {} to {}'.format(deadline, deadline+self.pacer_delta))
                     deadline += self.pacer_delta
-        # else:
-        #     if current_round > server.pacer_window * 2:
-        #         if sum(server.round_exploited_utility[-(2*server.pacer_window):-(server.pacer_window)]) > sum(server.round_exploited_utility[-(server.pacer_window):]):
-        #             logger.info('by oort, the oort_non_pacer_deadline is changed from {} to {}'.format(server.oort_non_pacer_deadline, server.oort_non_pacer_deadline+10))
-        #             server.deadline += 10
-        
         return deadline
-    
+
     def update_epsilon(self):
         if self.epsilon > 0.2:
             logger.info('epsilon {}'.format(self.epsilon))
@@ -68,7 +61,7 @@ class Oort:
             self.epsilon = 0.0
             logger.info('epsilon {}'.format(self.epsilon))
     
-    def select_clients(self, all_clients, possible_clients, num_clients, clients_info, current_round, deadline, batch_size, num_epochs, behav_hete = False, fb_client_selection = False, fb_inference_pipelining = False):
+    def select_clients(self, all_clients, possible_clients, num_clients, clients_info, current_round, deadline, batch_size, num_epochs, behav_hete = False, fb_client_selection = False, fb_inference_pipelining = False, oortbalancer = False):
         # if oort_blacklist is on, add clients that are selected for more rounds than a threshold 
         # to the blacklist_clients list
         if self.oort_blacklist:
@@ -128,6 +121,7 @@ class Oort:
                     summ *= math.pow(deadline / clients_info[str(c_id)]["last_selected_round_duration"], self.system_utility_penalty_alpha)
             else:
                 if fb_client_selection and fb_inference_pipelining:
+                # if fb_inference_pipelining:
                     client_complete_time = (c_id_to_client_object[c_id].device.get_expected_download_time()) + (c_id_to_client_object[c_id].device.get_expected_upload_time()) +  ((np.mean(c_id_to_client_object[c_id].trained_num_of_samples[-5:])-1)//batch_size + 1) * np.mean(c_id_to_client_object[c_id].per_batch_train_times) * num_epochs
                 else:
                     client_complete_time = (c_id_to_client_object[c_id].device.get_expected_download_time()) + (c_id_to_client_object[c_id].device.get_expected_upload_time()) + np.mean(c_id_to_client_object[c_id].inference_times_per_sample) * (c_id_to_client_object[c_id].num_train_samples) +  ((np.mean(c_id_to_client_object[c_id].trained_num_of_samples[-5:])-1)//batch_size + 1) * np.mean(c_id_to_client_object[c_id].per_batch_train_times) * num_epochs
@@ -162,39 +156,11 @@ class Oort:
                 c_id_over_cutoff_loss_sum += item[1]
             else:
                 c_id_less_cutoff_loss_ids.append(item[0])
-        
         # Pick each clients based on the probability based on the utility divided by the utility sum
         for probs_idx in range(len(c_id_over_cutoff_loss_probs)):
             c_id_over_cutoff_loss_probs[probs_idx] /= c_id_over_cutoff_loss_sum
 
-        intersection_btw_possible_clients_and_c_id_over_cutoff_loss_ids = []
-        intersection_btw_possible_clients_and_c_id_over_cutoff_loss_probs = []
-        possible_clients_not_in_c_id_over_cutoff_loss_ids = []
-
-        # Behav_hete needs more debugging.. this will be patched soon. However, behav_hete was not related to evaluation in our FedBalancer paper!
-        if behav_hete:
-            for c_id_idx in range(len(c_id_over_cutoff_loss_ids)):
-                if c_id_over_cutoff_loss_ids[c_id_idx] in possible_clients_ids:
-                    intersection_btw_possible_clients_and_c_id_over_cutoff_loss_ids.append(c_id_over_cutoff_loss_ids[c_id_idx])
-                    intersection_btw_possible_clients_and_c_id_over_cutoff_loss_probs.append(c_id_over_cutoff_loss_probs[c_id_idx])
-            
-            i_probs_sum = 0
-            for i_prob in intersection_btw_possible_clients_and_c_id_over_cutoff_loss_probs:
-                i_probs_sum += i_prob
-            
-            for i_prob_idx in range(len(intersection_btw_possible_clients_and_c_id_over_cutoff_loss_probs)):
-                intersection_btw_possible_clients_and_c_id_over_cutoff_loss_probs[i_prob_idx] /= i_probs_sum
-            
-            for p_c_id_ in possible_clients_ids:
-                if p_c_id_ not in intersection_btw_possible_clients_and_c_id_over_cutoff_loss_ids:
-                    possible_clients_not_in_c_id_over_cutoff_loss_ids.append(p_c_id_)
-
-            if len(intersection_btw_possible_clients_and_c_id_over_cutoff_loss_ids) > int(num_clients*(1-self.epsilon)):
-                selected_clients_ids = np.random.choice(intersection_btw_possible_clients_and_c_id_over_cutoff_loss_ids, int(num_clients*(1-self.epsilon)), replace=False, p=intersection_btw_possible_clients_and_c_id_over_cutoff_loss_probs)    
-            else:
-                selected_clients_ids = intersection_btw_possible_clients_and_c_id_over_cutoff_loss_ids
-        else:
-            selected_clients_ids = np.random.choice(c_id_over_cutoff_loss_ids, int(num_clients*(1-self.epsilon)), replace=False, p=c_id_over_cutoff_loss_probs)
+        selected_clients_ids = np.random.choice(c_id_over_cutoff_loss_ids, int(num_clients*(1-self.epsilon)), replace=False, p=c_id_over_cutoff_loss_probs)
         
         # Sample clients from epsilon, which have less utility than the cutoff_loss
         # Prioritize clients which have faster speed;
@@ -213,36 +179,37 @@ class Oort:
             if len(c_id_less_cutoff_loss_ids) < epsilon_selected_clients_len:
                 additional_c_id_less_cutoff_loss_ids = np.random.choice(c_ids_tobe_removed, min(len(c_ids_tobe_removed), int(epsilon_selected_clients_len - len(c_id_less_cutoff_loss_ids))), replace=False)
                 c_id_less_cutoff_loss_ids = [*c_id_less_cutoff_loss_ids, *additional_c_id_less_cutoff_loss_ids]
-
-            devices_lists_from_fast_to_slow = ['Google Pixel 4', 'Xiaomi Redmi Note 7 Pro', 'Google Nexus S']
-            device_idx = 0
-
-            while len(epsilon_selected_clients_ids) < epsilon_selected_clients_len and device_idx < 3:
-                tmp_epsilon_selected_clients_ids = []
-                for c_id in c_id_less_cutoff_loss_ids:
-                    if (clients_info[str(c_id)]["device"] == devices_lists_from_fast_to_slow[device_idx]):
-                        if behav_hete:
-                            if c_id in possible_clients_ids:
-                                tmp_epsilon_selected_clients_ids.append(c_id)
-                        else:
-                            tmp_epsilon_selected_clients_ids.append(c_id)
-                if (len(epsilon_selected_clients_ids) + len(tmp_epsilon_selected_clients_ids)) > epsilon_selected_clients_len:
-                    curr_device_epsilon_selected_clients_ids = np.random.choice(tmp_epsilon_selected_clients_ids, epsilon_selected_clients_len - len(epsilon_selected_clients_ids), replace=False)
-                else:
-                    curr_device_epsilon_selected_clients_ids = tmp_epsilon_selected_clients_ids
-                epsilon_selected_clients_ids = [*epsilon_selected_clients_ids, *curr_device_epsilon_selected_clients_ids]
-                device_idx += 1
             
-            if len(epsilon_selected_clients_ids) < epsilon_selected_clients_len:
-                if behav_hete:
-                    if min(int(num_clients - len(epsilon_selected_clients_ids)), len(intersection_btw_possible_clients_and_c_id_over_cutoff_loss_ids)) > 0:
-                        selected_clients_ids = np.random.choice(intersection_btw_possible_clients_and_c_id_over_cutoff_loss_ids, min(int(num_clients - len(epsilon_selected_clients_ids)), len(intersection_btw_possible_clients_and_c_id_over_cutoff_loss_ids)), replace=False, p=intersection_btw_possible_clients_and_c_id_over_cutoff_loss_probs)
-                    if len(selected_clients_ids) + len(epsilon_selected_clients_ids) < num_clients:
-                        remaining_sampled_clients_ids = np.random.choice(possible_clients_not_in_c_id_over_cutoff_loss_ids, num_clients - (len(selected_clients_ids) + len(epsilon_selected_clients_ids)), replace=False)
-                        selected_clients_ids = [*selected_clients_ids, *remaining_sampled_clients_ids]
+            unselected_devices_round_latencies = []
+            for c_id in c_id_less_cutoff_loss_ids:
+                if fb_inference_pipelining:
+                    client_complete_time = (c_id_to_client_object[c_id].device.get_expected_download_time()) + (c_id_to_client_object[c_id].device.get_expected_upload_time()) +  ((np.mean(c_id_to_client_object[c_id].trained_num_of_samples[-5:])-1)//batch_size + 1) * np.mean(c_id_to_client_object[c_id].per_batch_train_times) * num_epochs
                 else:
-                    selected_clients_ids = np.random.choice(c_id_over_cutoff_loss_ids, min(int(num_clients - len(epsilon_selected_clients_ids)), len(c_id_over_cutoff_loss_ids)), replace=False, p=c_id_over_cutoff_loss_probs)
+                    client_complete_time = (c_id_to_client_object[c_id].device.get_expected_download_time()) + (c_id_to_client_object[c_id].device.get_expected_upload_time()) + np.mean(c_id_to_client_object[c_id].inference_times_per_sample) * (c_id_to_client_object[c_id].num_train_samples) +  ((np.mean(c_id_to_client_object[c_id].trained_num_of_samples[-5:])-1)//batch_size + 1) * np.mean(c_id_to_client_object[c_id].per_batch_train_times) * num_epochs
+                    
+                unselected_devices_round_latencies.append((c_id, client_complete_time))
+            
+            unselected_devices_round_latencies = sorted(unselected_devices_round_latencies, key = lambda x: x[1])
+            epsilon_selected_clients_ids = [elem[0] for elem in unselected_devices_round_latencies[:min(epsilon_selected_clients_len, len(unselected_devices_round_latencies))]]
+
+            if len(epsilon_selected_clients_ids) < epsilon_selected_clients_len:
+                selected_clients_ids = np.random.choice(c_id_over_cutoff_loss_ids, min(int(num_clients - len(epsilon_selected_clients_ids)), len(c_id_over_cutoff_loss_ids)), replace=False, p=c_id_over_cutoff_loss_probs)
+
+            
+            logger.debug("UTILITY SELECTED CLIENTS: " + str(len(selected_clients_ids)))
+            logger.debug(str(selected_clients_ids))
+            logger.debug("EPSILON SELECTED CLIENTS: " + str(len(epsilon_selected_clients_ids)))
+            logger.debug(str(epsilon_selected_clients_ids))
+            logger.debug(str(sorted_c_id_and_overthreshold_loss))
             selected_clients_ids = [*selected_clients_ids, *epsilon_selected_clients_ids]
+
+            if len(selected_clients_ids) < num_clients:
+                additional_clients_ids = np.random.choice(c_ids_tobe_removed, min(int(num_clients - len(selected_clients_ids)), len(c_ids_tobe_removed)), replace=False)
+                selected_clients_ids = [*selected_clients_ids, *additional_clients_ids]
+        else:
+            logger.debug("UTILITY SELECTED CLIENTS: " + str(len(selected_clients_ids)))
+            logger.debug(str(selected_clients_ids))
+            logger.debug(str(sorted_c_id_and_overthreshold_loss))
         
         #Update client_last_selected_round of each selected clients
         for c_id in selected_clients_ids:

@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from utils.model_utils import batch_data,unravel_model_params,ravel_model_params
+from utils.model_utils import batch_data
 
 INPUT_SIZE = 28
 
@@ -27,10 +27,6 @@ class CNN(nn.Module):
         feature=self.conv(x)
         output=self.fc(feature.view(x.shape[0], -1))
         return output
-    def get_params(self):
-        return ravel_model_params(self)
-    def set_params(self,model_params):
-        unravel_model_params(self,model_params)
 
 def build_net(num_classes):
     net = CNN(num_classes)

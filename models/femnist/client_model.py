@@ -15,8 +15,12 @@ class ClientModel(Model):
         self.lr = lr
         self.num_classes=num_classes
 
-        # TODO: Implement FedProx for PyTorch version
+        # TODO: NEED TO IMPLEMENT FedProx optimizer with PYTORCH VERSION; CURRENTLY UNAVAILABLE
+        # HOWEVER, the best FedProx variable mu was 0 for FEMNIST, Reddit, Shakespeare, UCI-HAR, which are 4 out of 5 datasets used in FedBalancer paper
+        # You could run FedProx without this optimizer, when mu == 0 :) Will fix this later
+
         # if cfg.fedprox:
+
 
         super(ClientModel,self).__init__(seed,lr)
 
@@ -37,8 +41,6 @@ class ClientModel(Model):
         output = self.net(x_vecs)
         pred = output.argmax(dim=1, keepdim=True)
         correct = pred.eq(labels.view_as(pred)).sum().item()
-        # print("HAHA")
-        # print(self.losses(output, labels), self.losses(output, labels).mean(), torch.mean(self.losses(output, labels)))
         loss_list = self.losses(output, labels)
         loss = loss_list.mean().item()
         loss_list = [t.item() for t in loss_list]

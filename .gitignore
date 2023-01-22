@@ -8,7 +8,7 @@
 *.data-00000-of-00001
 *ipynb_checkpoints*
 *.tar.gz
-*.log
+
 
 models/__pycache__/
 models/*/__pycache__/

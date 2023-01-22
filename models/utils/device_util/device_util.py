@@ -1,5 +1,5 @@
 ## TODO use rank instead of the score to find the nearest model
-## TODO change small middle big device to our real wupported device
+## TODO change small middle big device to our real supported device
 
 
 import json
@@ -23,8 +23,6 @@ class Device_Util:
                 self.supported_devices = json.load(f)
                 self.supported_score = [self.benchmark2score[device] for device in self.supported_devices]
                 self.supported_rank = [list(self.benchmark2score).index(device) for device in self.supported_devices]
-                # print('supported_score: {}'.format(self.supported_score))
-                # print('supported_rank: {}'.format(self.supported_rank))
 
         except Exception as e:
             traceback.print_exc()

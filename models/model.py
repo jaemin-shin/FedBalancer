@@ -24,22 +24,12 @@ class Model(ABC):
         self.lr = lr
         self.seed = seed
         
-        # self.features, self.labels, self.train_op, self.eval_metric_ops, self.loss, self.loss_list, self.flag_training, self.batch_gradients = self.create_model()
         self.DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         print(self.DEVICE)
         
         self.net, self.losses, self.optimizer, self.optimizer_args = self.create_model()
 
         self.size = sum(p.numel() for p in self.net.parameters()) * 4 # 4byte per parameter
-
-        np.random.seed(self.seed)
-    
-    def update_with_gradiant(self, gradients):
-        params = self.get_params()
-        for i in range(len(gradients)):
-            params[i] -= gradients[i]*self.lr
-        self.set_params(params)
-        return params
 
     @abstractmethod
     def create_model(self):
@@ -78,7 +68,7 @@ class Model(ABC):
 
         return update, acc, loss, data_loss_list_and_idx
     
-    def oorttrain(self, data, data_idx, xss, yss, num_epochs=1, batch_size=10):
+    def oorttrain(self, data_idx, xss, yss, num_epochs=1, batch_size=10, oortbalancer=False):
         """
         Trains the client model.
         """
@@ -86,6 +76,13 @@ class Model(ABC):
         representative_batched_data = {}
 
         data_loss_list_and_idx = []
+        
+        if oortbalancer:
+            with torch.no_grad():
+                order = np.array(range(len(xss)))
+                np.random.shuffle(order)
+                xss[np.array(range(len(xss)))] = xss[order]
+                yss[np.array(range(len(xss)))] = yss[order]
 
         for i in range(num_epochs):
             xs = xss[i*(int(len(xss)/num_epochs)):(i+1)*(int(len(xss)/num_epochs))]

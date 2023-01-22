@@ -145,7 +145,7 @@ class FedBalancer:
 
         return selected_data, num_data, data_idx, sorted_loss
     
-    # Algorithm 1, Oort+FedBalancer (oortbalancer) version
+    # Algorithm 1, Oort + FedBalancer (oortbalancer) version
     def fb_oortbalancer_sample_selection(self, batch_size, loss_threshold, whole_data_loss_list, train_data, deadline, train_time_per_batch_list, num_epochs, model):
         data_len = len(whole_data_loss_list)
         tmp_data = zip(train_data["x"], train_data["y"])
@@ -159,7 +159,6 @@ class FedBalancer:
         j = len(tmp_data)
 
         num_data = batch_size
-        uniquely_seen_data_cnt = 0 # for required inference time calculation
 
         # OortBalancer selects a batch per epoch based on how FedBalancer selects samples; only the number of selected samples are fixed as batch_size * num_epoch
         # Same as Oort, OortBalancer selects same samples multiple times if the client has less data than batch_size * num_epoch
@@ -184,8 +183,6 @@ class FedBalancer:
             added_data = [x for x,_ in added_data_pkg]
             added_data_idx = [x for _,x in added_data_pkg]
             xss, yss = zip(*added_data)
-            
-            uniquely_seen_data_cnt = num_data * num_epochs
 
         elif len(train_data["x"]) >= num_data:
             xss = []
@@ -194,7 +191,6 @@ class FedBalancer:
             sampled_batch_cnt = 0
             added_data_idx = []
             while sampled_batch_cnt != num_epochs:
-                #print(len(tmp_data))
                 this_iteration_sample_batch_cnt = min(num_epochs - sampled_batch_cnt, nb)
 
                 easy_data_cnt = int((num_data) * this_iteration_sample_batch_cnt * self.fb_p)
@@ -212,7 +208,6 @@ class FedBalancer:
 
                 added_data_pkg = easy_data_pkg + hard_data_pkg
                 
-                #print("TMP", tmp_data)
                 np.random.shuffle(added_data_pkg)
 
                 added_data = [x for x,_ in added_data_pkg]
@@ -222,9 +217,6 @@ class FedBalancer:
                 xss += xsss
                 yss += ysss
                 sampled_batch_cnt += this_iteration_sample_batch_cnt
-
-                if uniquely_seen_data_cnt == 0:
-                    uniquely_seen_data_cnt = this_iteration_sample_batch_cnt * num_data
         else:
             xss = []
             yss = []
@@ -251,7 +243,6 @@ class FedBalancer:
                 xsss, ysss = zip(*added_data)
                 xss += xsss
                 yss += ysss
-            uniquely_seen_data_cnt = len(train_data["x"])
 
         xs = xss[:min(batch_size, len(train_data["x"]))]
         ys = yss[:min(batch_size, len(train_data["x"]))]
@@ -266,7 +257,7 @@ class FedBalancer:
         xss = self.preprocess_data_x(xss)
         yss = self.preprocess_data_y(yss)
 
-        return oort_whole_data, xss, yss, num_data, data_idx, sorted_loss, uniquely_seen_data_cnt
+        return oort_whole_data, xss, yss, num_data, data_idx, sorted_loss
     
     # Algorithm 2 from the FedBalancer paper
     def loss_threshold_selection(self):
@@ -300,11 +291,11 @@ class FedBalancer:
                         self.deadline_ratio += self.fb_simple_control_ddl_stepsize
     
     # Algorithm 4 from the FedBalancer paper
-    def deadline_selection(self, selected_clients, clients_info, num_epochs, deadline, batch_size):
+    def deadline_selection(self, selected_clients, clients_info, num_epochs, deadline, batch_size, current_round):
         # Deadline is only updated when the round completion time of more than half clients (or more than 200 clients) are explored
         if (self.filter_if_more_than_ratio_is_explored([clients_info[str(cid)]["one_epoch_train_time"] for cid in clients_info.keys()], 0.5) or self.filter_if_more_than_number_is_explored([clients_info[str(cid)]["one_epoch_train_time"] for cid in clients_info.keys()], 200)):
-            deadline_low = self.findPeakDDLE(selected_clients, 1, batch_size)
-            deadline_high = self.findPeakDDLE(selected_clients, num_epochs, batch_size)
+            deadline_low = self.findPeakDDLE(selected_clients, 1, batch_size, current_round)
+            deadline_high = self.findPeakDDLE(selected_clients, num_epochs, batch_size, current_round)
             deadline = deadline_low + (deadline_high - deadline_low) * self.deadline_ratio
 
             logger.info('deadline_low {}, deadline_high {}, deadline {}'.format(deadline_low, deadline_high, deadline))
@@ -312,7 +303,7 @@ class FedBalancer:
         return deadline
     
     # Algorithm 4 from the FedBalancer paper
-    def findPeakDDLE(self, selected_clients, num_epochs, batch_size):
+    def findPeakDDLE(self, selected_clients, num_epochs, batch_size, current_round):
         t_max = sys.maxsize
         total_user_count = len(selected_clients)
         
