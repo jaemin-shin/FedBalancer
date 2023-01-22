@@ -70,14 +70,14 @@ $ sudo apt-get dist-upgrade
 
 ## Datasets
 
-This repository contains experiment on a widely used dataset for FL benchmark, ```FEMNIST```.
+This repository contains experiment on a widely used dataset for the FL benchmark, ```FEMNIST```.
 
 ## How to Run the Experiments
 
 ### Running the main experiment of the paper in Section 4.2 and 4.3 one by one
 
 1. Go to directory of FEMNIST dataset in `data/femnist` for instructions on generating the benchmark dataset
-2. Run (please refer to the list of config files in the subdirectory with respective dataset name in ```configs/```, it contains all the config files for the experiment)
+2. Run (please refer to the list of config files in the subdirectory in ```configs/femnist/```, it contains all the config files for the experiment)
 ```
 $ cd models/
 
@@ -100,11 +100,11 @@ To simplify the command line arguments, we move most of the parameters to a <spa
 ```bash
 ## whether to consider heterogeneity
 behav_hete False # bool, whether to simulate state(behavior) heterogeneity -> fixed to False in our experiments
-hard_hete False # bool, whether to simulate hardware heterogeneity, which contains differential on-device training time and network speed -> fixed to True in our experiments
+hard_hete True # bool, whether to simulate hardware heterogeneity, which contains differential on-device training time and network speed -> fixed to True in our experiments
 
 ## ML related configurations
 dataset femnist # dataset to use
-model lr # file that defines the model (in this example, it is LogisticRegression)
+model cnn # file that defines the model (in this example, it is a CNN model defined under models/femnist/)
 learning_rate 0.0003 # learning-rate of LR
 batch_size 10 # batch-size for training 
 
@@ -118,45 +118,26 @@ num_epochs 5 # number of training epochs (E) for each client in each round
 seed 0 # basic random seed
 update_frac 0.01  # min update fraction in each round, round fails when fraction of clients that successfully upload their is not less than "update_frac" -> fixed to 0.01 in our experiments
 
-aggregate_algorithm SucFedAvg # choose in [SucFedAvg, FedAvg], please refer to models/server.py for more details. In the configuration file, SucFedAvg refers to the "FedAvg" algorithm described in https://arxiv.org/pdf/1602.05629.pdf -> this is fixed to SucFedAvg in our experiments
-
-### ----- NOTE! below are advanced configurations. 
-### ----- Strongly recommend: specify these configurations only after reading the source code. 
-
-# compress_algo grad_drop # gradiant compress algorithm, choose in [grad_drop, sign_sgd], not use if commented
-# structure_k 100
-## the k for structured update, not use if commented, please refer to the arxiv for more 
-
-# qffl True # whether to apply qffl(q-fedavg) and params needed, please refer to the ICLR'20 (https://arxiv.org/pdf/1905.10497.pdf) for more
-# qffl_q 5
-
-## parameters related to Oort client selection method, please refer to the OSDI'21 (https://www.usenix.org/conference/osdi21/presentation/lai) for more
-oort True # whether to apply oort or not
-# oort_pacer True # whether to apply oort-pacer or not
-# oort_pacer_delta 10
-# oort_blacklist True # whether to apply oort's client blacklisting or not
-# oort_blacklist_rounds
+aggregate_algorithm SucFedAvg # fixed to SucFedAvg in our experiments, SucFedAvg refers to the "FedAvg" algorithm described in https://arxiv.org/pdf/1602.05629.pdf 
 
 ### ----- NOTE! below are configurations for our baselines.
-### ----- Strongly recommend: specify these configurations only after reading the source code. 
 
 ## parameters to configure deadlines
 # ddl_baseline_fixed True # True if experiment uses fixed deadline
-# ddl_baseline_fixed_value_multiplied_at_mean 1.0 # In our experiments, the deadline is sampled as mean of clients' round completion times. This parameter indicates the multiplication factor at the sampled deadline. If 1.0, the mean is just used, and this becomes the 1T experiment. If 2.0, 2.0 x mean is used, and this becomes the 2T experiment.
-# ddl_baseline_smartpc False # True if SmartPC or Wait-For-All experiment.
-# ddl_baseline_smartpc_percentage 0.8 # Specifies the portion of clients that will successfully send the result at a round. If 0.8, this indicates SmartPC experiment. If 1.0, the round waits for every clients to end, and this is Wait-For-All experiment.
+# ddl_baseline_fixed_value_multiplied_at_mean 1.0 # In our experiments, the deadline is sampled as mean of clients' round completion times. This parameter indicates the multiplication factor at the sampled deadline. If 1.0, the mean is used, and this becomes the 1T experiment in our paper. If 2.0, 2.0 times mean is used, and this becomes the 2T experiment in our paper.
+# ddl_baseline_smartpc False # True if using SmartPC (SPC) or Wait-For-All (WFA) as a deadline configuration method.
+# ddl_baseline_smartpc_percentage 0.8 # Specifies the portion of clients that will successfully send the result at a round. If 0.8, this indicates SmartPC (SPC) experiment in our paper. If 1.0, the round waits for every clients to end, and this is Wait-For-All (WFA) experiment in our paper.
 
 ## fedprox parameters
-# fedprox True # whether to apply fedprox and params needed, please refer to the sysml'20 (https://arxiv.org/pdf/1812.06127.pdf) for more details
-# fedprox_mu 0.5
+# fedprox True # whether to apply fedprox and params needed, please refer to T. Li et al., MLSys'20 (https://arxiv.org/pdf/1812.06127.pdf) for more details
+# fedprox_mu 0.0
 
 ## sample selection baseline parameters
-# ss_baseline True
+# ss_baseline True # whether to apply sample selection baseline from our paper, please refer to configs/femnist/femnist_sampleselection_baseline.cfg when running this experiment
 
 ## Other paraemeters
-global_final_time 500000 # the experiment terminates if the time in the experiment exceeds the global_final_time
+global_final_time 300000 # the experiment terminates if the time in the experiment exceeds the global_final_time
 # global_final_test_accuracy 0.9 # the experiment terminates if the test accuracy exceeds the global_final_test_accuracy
-# output_path /path/to/your/preferred/directory # path to save experiment output files -- attended clients and clients info
 
 ### ----- NOTE! below are configurations for FedBalancer.
 ### ----- Strongly recommend: please refer to our paper when configuring below parameters.
