@@ -1,5 +1,5 @@
 ## TODO use rank instead of the score to find the nearest model
-## TODO change small middle big device to our real wupported device
+## TODO change small middle big device to our real supported device
 
 
 import json
@@ -7,7 +7,6 @@ import traceback
 import sys
 import os
 import numpy as np
-from keras import models
 cur_dir = os.path.dirname(__file__)
 
 class Device_Util:
@@ -24,8 +23,6 @@ class Device_Util:
                 self.supported_devices = json.load(f)
                 self.supported_score = [self.benchmark2score[device] for device in self.supported_devices]
                 self.supported_rank = [list(self.benchmark2score).index(device) for device in self.supported_devices]
-                # print('supported_score: {}'.format(self.supported_score))
-                # print('supported_rank: {}'.format(self.supported_rank))
 
         except Exception as e:
             traceback.print_exc()
@@ -131,34 +128,6 @@ class Device_Util:
         '''
         return real_device in self.real2benchmark and 'unknown' not in self.real2benchmark[real_device]
     
-    def get_layer_train_time(self, device, layer, batch_size, seq_len, in_size, out_size):
-        """
-        :return single layer train time, in seconds
-        :param device: device type in ['sumsung_note10', 'redmi_note8', 'nexus6'] for small, middle, big
-        :param layer: in ['embedding', 'lstm', 'output']
-        :return:
-        """
-        redundent_outsize = 2 / 10000
-        if layer == 'embedding':
-            in_size /= 10000
-            out_size /= 1000
-        elif layer == 'lstm':
-            in_size /= 1000
-            out_size /= 1000
-        else:
-            in_size /= 1000
-            out_size /= 10000
-        batch_size /= 50
-        seq_len /= 10
-        model = models.load_model(os.path.join('model/lookup_table', device, '{}.h5'.format(layer)))
-        output = models.load_model(os.path.join('model/lookup_table', device, 'output.h5'))
-        x = [[in_size, out_size, batch_size, seq_len]]
-        redundent = [[out_size, redundent_outsize, batch_size, seq_len]]
-        if layer == 'embedding' or layer == 'lstm':
-            return model.predict(np.array(x)) - output.predict(np.array(redundent))
-        else:
-            return model.predict(np.array(x))
-    
     def get_train_time_and_train_time_per_batch_and_train_time_per_epoch(self, model, num_sample, batch_size, num_epoch):
         '''
             Args:
@@ -168,30 +137,14 @@ class Device_Util:
                 num_epoch: number of epoches
         '''
 
-        reddit_mean = [2596, 916, 527.7]
-        reddit_std = [335.5, 20.6, 49.0]
-        celeba_mean = [5392, 1355, 561]
-        celeba_std = [982.5, 54.6, 20.3]
         femnist_mean = [1642, 588, 179]          
         femnist_std = [99.5, 23.9, 2.3]
-        har_mean = [(25305880 / 26414840) * elem for elem in femnist_mean]          
-        har_std = [(25305880 / 26414840) * elem for elem in femnist_std]
-        shakespeare_mean = [28621, 13579, 10681]    # batch size = 100
-        shakespeare_std = [1720.7, 104.6, 125.6]    # batch size = 100
 
         ii = self.supported_devices.index(model)
-        if self.model == 'cnn' and self.dataset == 'celeba':
-            train_time_per_batch = np.random.normal(celeba_mean[ii], celeba_std[ii]) / 1000
-        elif 'stacked_lstm' in self.model and  'reddit' in self.dataset:
-            train_time_per_batch = np.random.normal(reddit_mean[ii], reddit_std[ii]) / 1000
-        elif self.model == 'cnn' and self.dataset == 'femnist':
+        if self.model == 'cnn' and self.dataset == 'femnist':
             train_time_per_batch = np.random.normal(femnist_mean[ii], femnist_std[ii]) / 1000
-        elif self.model == 'cnn' and self.dataset == 'har':
-            train_time_per_batch = np.random.normal(har_mean[ii], har_std[ii]) / 1000
-        elif 'stacked_lstm' in self.model and self.dataset == 'shakespeare':
-            train_time_per_batch = np.random.normal(shakespeare_mean[ii], shakespeare_std[ii]) / 1000
         else:
-            train_time_per_batch = np.random.normal(reddit_mean[ii], reddit_std[ii]) / 1000
+            train_time_per_batch = np.random.normal(femnist_mean[ii], femnist_std[ii]) / 1000
         return num_epoch * ((num_sample-1)//batch_size + 1) * train_time_per_batch, train_time_per_batch, ((num_sample-1)//batch_size + 1) * train_time_per_batch
     
     def get_train_time_per_batch(self, model):
@@ -203,30 +156,14 @@ class Device_Util:
                 num_epoch: number of epoches
         '''
 
-        reddit_mean = [2596, 916, 527.7]
-        reddit_std = [335.5, 20.6, 49.0]
-        celeba_mean = [5392, 1355, 561]
-        celeba_std = [982.5, 54.6, 20.3]
         femnist_mean = [1642, 588, 179]          
         femnist_std = [99.5, 23.9, 2.3]
-        har_mean = [(25305880 / 26414840) * elem for elem in femnist_mean]          
-        har_std = [(25305880 / 26414840) * elem for elem in femnist_std]
-        shakespeare_mean = [28621, 13579, 10681]    # batch size = 100
-        shakespeare_std = [1720.7, 104.6, 125.6]    # batch size = 100
 
         ii = self.supported_devices.index(model)
-        if self.model == 'cnn' and self.dataset == 'celeba':
-            train_time_per_batch = np.random.normal(celeba_mean[ii], celeba_std[ii]) / 1000
-        elif 'stacked_lstm' in self.model and  'reddit' in self.dataset:
-            train_time_per_batch = np.random.normal(reddit_mean[ii], reddit_std[ii]) / 1000
-        elif self.model == 'cnn' and self.dataset == 'femnist':
+        if self.model == 'cnn' and self.dataset == 'femnist':
             train_time_per_batch = np.random.normal(femnist_mean[ii], femnist_std[ii]) / 1000
-        elif self.model == 'cnn' and self.dataset == 'har':
-            train_time_per_batch = np.random.normal(har_mean[ii], har_std[ii]) / 1000
-        elif 'stacked_lstm' in self.model and self.dataset == 'shakespeare':
-            train_time_per_batch = np.random.normal(shakespeare_mean[ii], shakespeare_std[ii]) / 1000
         else:
-            train_time_per_batch = np.random.normal(reddit_mean[ii], reddit_std[ii]) / 1000
+            train_time_per_batch = np.random.normal(femnist_mean[ii], femnist_std[ii]) / 1000
         # print(train_time_per_batch)
         return train_time_per_batch
     
@@ -240,30 +177,14 @@ class Device_Util:
                 num_epoch: number of epoches
         '''
 
-        reddit_mean = [2596, 916, 527.7]
-        reddit_std = [335.5, 20.6, 49.0]
-        celeba_mean = [5392, 1355, 561]
-        celeba_std = [982.5, 54.6, 20.3]
         femnist_mean = [1642, 588, 179]          
         femnist_std = [99.5, 23.9, 2.3]
-        har_mean = [(25305880 / 26414840) * elem for elem in femnist_mean]          
-        har_std = [(25305880 / 26414840) * elem for elem in femnist_std]
-        shakespeare_mean = [28621, 13579, 10681]    # batch size = 100
-        shakespeare_std = [1720.7, 104.6, 125.6]    # batch size = 100
 
         ii = self.supported_devices.index(model)
-        if self.model == 'cnn' and self.dataset == 'celeba':
-            train_time_per_batch = np.random.normal(celeba_mean[ii], celeba_std[ii]) / 1000
-        elif 'stacked_lstm' in self.model and  'reddit' in self.dataset:
-            train_time_per_batch = np.random.normal(reddit_mean[ii], reddit_std[ii]) / 1000
-        elif self.model == 'cnn' and self.dataset == 'femnist':
+        if self.model == 'cnn' and self.dataset == 'femnist':
             train_time_per_batch = np.random.normal(femnist_mean[ii], femnist_std[ii]) / 1000
-        elif self.model == 'cnn' and self.dataset == 'har':
-            train_time_per_batch = np.random.normal(har_mean[ii], har_std[ii]) / 1000
-        elif 'stacked_lstm' in self.model and self.dataset == 'shakespeare':
-            train_time_per_batch = np.random.normal(shakespeare_mean[ii], shakespeare_std[ii]) / 1000
         else:
-            train_time_per_batch = np.random.normal(reddit_mean[ii], reddit_std[ii]) / 1000
+            train_time_per_batch = np.random.normal(femnist_mean[ii], femnist_std[ii]) / 1000
         # print(train_time_per_batch)
         return ((num_sample-1)//batch_size + 1) * train_time_per_batch
 

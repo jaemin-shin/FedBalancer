@@ -48,7 +48,6 @@ class Device():
             if cfg.hard_hete == False:
                 # assign a fixed speed distribution
                 guid = list(Device.speed_distri.keys())[cfg.seed%len(Device.speed_distri)]
-                # logger.info(guid)
             else:
                 guid = random.sample(list(Device.speed_distri.keys()), 1)[0]
             self.download_speed_u = Device.speed_distri[guid]['down_u']
@@ -72,14 +71,15 @@ class Device():
     def set_device_model_weakDeviceToCertainClass(self, real_device_model, label):
         self.device_model = Device.du.unknown_weakDeviceToCertainClass(label)
     
-    def get_upload_time(self, model_size):
+    def get_upload_time(self):
         if self.model_size == 0.0 :
             return 0.0
-
+        
         upload_speed = np.random.normal(self.upload_speed_u, self.upload_speed_sigma)
         while upload_speed < 0:
             upload_speed = np.random.normal(self.upload_speed_u, self.upload_speed_sigma)
-        upload_time = model_size / upload_speed / 1000
+        
+        upload_time = self.model_size / upload_speed
         return float(upload_time)
 
     def get_download_time(self):

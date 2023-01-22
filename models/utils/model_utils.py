@@ -2,18 +2,24 @@ import json
 import numpy as np
 import os
 from collections import defaultdict
+import torch
+import importlib
+from utils.logger import Logger
 
+L = Logger()
+logger = L.get_logger()
 
 def batch_data(data, data_idx, batch_size, seed):
     '''
     data is a dict := {'x': [numpy array], 'y': [numpy array]} (on one client)
     returns x, y, which are both numpy array of length: batch_size
     '''
-    data_x = list(data['x'])
-    data_y = list(data['y'])
 
     # randomly shuffle data
-    np.random.seed(seed)
+    # np.random.seed(seed)
+    data_y = data['y'].detach().numpy()
+    data_x = data['x'].detach().numpy()
+
     rng_state = np.random.get_state()
     np.random.shuffle(data_x)
     np.random.set_state(rng_state)
@@ -27,30 +33,6 @@ def batch_data(data, data_idx, batch_size, seed):
         batched_y = data_y[i:i+batch_size]
         batched_idx = data_idx[i:i+batch_size]
         yield (batched_x, batched_y, batched_idx)
-
-def batch_data_multiple_iters(data, batch_size, num_iters):
-    data_x = data['x']
-    data_y = data['y']
-
-    np.random.seed(100)
-    rng_state = np.random.get_state()
-    np.random.shuffle(data_x)
-    np.random.set_state(rng_state)
-    np.random.shuffle(data_y)
-
-    idx = 0
-
-    for i in range(num_iters):
-        if idx+batch_size >= len(data_x):
-            idx = 0
-            rng_state = np.random.get_state()
-            np.random.shuffle(data_x)
-            np.random.set_state(rng_state)
-            np.random.shuffle(data_y)
-        batched_x = data_x[idx: idx+batch_size]
-        batched_y = data_y[idx: idx+batch_size]
-        idx += batch_size
-        yield (batched_x, batched_y)
 
 def read_dir(data_dir):
     clients = []
@@ -91,3 +73,13 @@ def read_data_return_all(train_data_dir, test_data_dir):
 
     return train_clients, train_groups, train_data, test_clients, test_groups, test_data
 
+def build_net(dataset,model_name,num_classes):
+    model_file="%s/%s.py" %(dataset,model_name)
+    if not os.path.exists(model_file):
+        print("Please specify a valid model")
+    model_path="%s.%s" %(dataset,model_name)
+    #build net
+    mod=importlib.import_module(model_path)
+    build_net_op=getattr(mod,"build_net")
+    net=build_net_op(num_classes)
+    return net

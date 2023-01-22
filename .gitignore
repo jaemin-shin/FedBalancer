@@ -9,6 +9,7 @@
 *ipynb_checkpoints*
 *.tar.gz
 
+
 models/__pycache__/
 models/*/__pycache__/
 models/*/preprocess/__pycache__/
@@ -18,8 +19,4 @@ models/grad_compress/temp/*
 _build/
 _templates/
 
-data/har/data/*
-data/celeba/data/*
 data/femnist/data/*
-data/big_reddit/data/*
-data/shakespeare/data/*
