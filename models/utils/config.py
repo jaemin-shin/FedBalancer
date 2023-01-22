@@ -36,8 +36,6 @@ class Config():
         self.hard_hete = False
 
         self.no_training = False
-        # grad_compress,  structure_k, fedprox and qffl are mutually-exclusive
-        self.compress_algo = None
         self.fedprox = False
         self.fedprox_mu = 0
         
@@ -70,8 +68,6 @@ class Config():
 
         self.global_final_time = 0
         self.global_final_test_accuracy = 0.0
-
-        self.output_path = ''
 
         self.ss_baseline = False
         
@@ -182,8 +178,6 @@ class Config():
                         self.global_final_test_accuracy = float(line[1].strip())
                     elif line[0] == 'noise_factor':
                         self.noise_factor = float(line[1].strip())
-                    elif line[0] == 'output_path':
-                        self.output_path = str(line[1])
                     elif line[0] == 'ss_baseline':
                         self.ss_baseline = line[1].strip()=='True'
                 except Exception as e:
